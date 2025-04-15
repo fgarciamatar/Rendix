@@ -5,10 +5,13 @@ import { FiDownload } from "react-icons/fi";
 import { useCajaStore } from "../../../stores/useCajaStore";
 import PDFReport from "../PDFReport";
 
+
 export default function PDFButtonClient() {
   const entradas = useCajaStore((state) => state.entradas);
   const salidas = useCajaStore((state) => state.salidas);
   const detalleEfectivo = useCajaStore((state) => state.detalleEfectivo);
+  // const detalleEfectivo = {20:3, 1000: 3}
+  console.log("DETALLE EFECTIVO", detalleEfectivo)
 
   const hayEntradas = entradas.length > 0;
   const haySalidas = salidas.length > 0;

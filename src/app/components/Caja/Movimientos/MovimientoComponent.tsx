@@ -1,11 +1,15 @@
 // MovimientoComponent.tsx
 "use client";
 
-import { RiDeleteBinLine } from "react-icons/ri";
-import { useCajaStore } from "../../../stores/useCajaStore";
-import { movimientosProps } from "./types";
 import { useState } from "react";
-import ConfirmacionMovimientoModal from "./../EliminarMovimientoModal"; 
+import { movimientosProps } from "./types";
+import { useCajaStore } from "../../../stores/useCajaStore";
+import ConfirmacionMovimientoModal from "./../EliminarMovimientoModal";
+
+//Icons
+import { LiaMoneyBillWaveAltSolid } from "react-icons/lia";
+import { RiDeleteBinLine } from "react-icons/ri";
+// import { GiSwapBag } from "react-icons/gi";  // icono para  la venta
 
 export default function MovimientoComponent({
   titulo,
@@ -13,7 +17,9 @@ export default function MovimientoComponent({
   esEntrada,
 }: movimientosProps) {
   const [eliminarModal, setEliminarModal] = useState(false);
-  const [conceptoSeleccionado, setConceptoSeleccionado] = useState<string | null>(null);
+  const [conceptoSeleccionado, setConceptoSeleccionado] = useState<
+    string | null
+  >(null);
 
   const eliminarMovimiento = useCajaStore((state) => state.EliminarMovimiento1);
 
@@ -48,7 +54,13 @@ export default function MovimientoComponent({
             key={index}
             className="grid grid-cols-3 items-center gap-2 border-b border-gray-700 py-3 hover:bg-gray-800 transition rounded-md text-lg min-h-[56px]"
           >
-            <p className="pl-2">{mov.concepto}</p>
+            <p className="pl-2 flex items-center gap-2">
+              {mov.detalleEfectivo && (
+                <LiaMoneyBillWaveAltSolid  size={28} className="text-green-400" />
+              )}
+              {mov.concepto}
+            </p>
+
             <p className="text-center">
               {typeof mov.monto === "number"
                 ? `$${mov.monto.toLocaleString("es-AR")}`
@@ -62,7 +74,7 @@ export default function MovimientoComponent({
                 }}
                 className="text-red-500 hover:text-red-400 transition-transform transform hover:scale-125 cursor-pointer"
               >
-                <RiDeleteBinLine size={20} />
+                <RiDeleteBinLine size={23} />
               </button>
             </div>
           </div>

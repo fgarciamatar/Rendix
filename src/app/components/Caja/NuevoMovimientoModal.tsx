@@ -8,6 +8,8 @@ interface Props {
     tipo: "Entrada" | "Salida";
     concepto: string;
     monto: number;
+    efectivo: boolean,
+    detalleEfectivo: boolean
   }) => void;
 }
 
@@ -15,6 +17,8 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
   const [tipo, setTipo] = useState("Salida");
   const [concepto, setConcepto] = useState("");
   const [monto, setMonto] = useState<number | string>("");
+  const [efectivo, setEfectivo] = useState(false);
+  const [detalleEfectivo, setDetalleEfectivo] = useState(false);
 
   const conceptoRef = useRef<HTMLInputElement>(null);
   const montoRef = useRef<HTMLInputElement>(null);
@@ -25,16 +29,22 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
     setTipo("Salida");
     setConcepto("");
     setMonto("");
+    setEfectivo(false)
+    setDetalleEfectivo(false)
     onClose();
   };
 
   const handleSave = () => {
     if (!concepto || !monto) return;
     if (tipo === "Entrada" || tipo === "Salida") {
+      setEfectivo(false)
+      setDetalleEfectivo(false)
       onSave?.({
         tipo,
         concepto,
         monto: Number(monto),
+        efectivo,
+        detalleEfectivo
       });
     }
 

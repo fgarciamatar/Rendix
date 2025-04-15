@@ -33,8 +33,10 @@ export default function CajaClient() {
     tipo: "Entrada" | "Salida";
     concepto: string;
     monto: number;
+    efectivo: boolean,
+    detalleEfectivo: boolean
   }) => {
-    agregarMovimiento(data.concepto, data.monto, data.tipo);
+    agregarMovimiento(data.concepto, data.monto, data.tipo, data.efectivo, data.detalleEfectivo);
     setModalConfirmacion(true);
   };
 

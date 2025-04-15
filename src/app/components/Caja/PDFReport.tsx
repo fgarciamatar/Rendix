@@ -75,6 +75,8 @@ const PDFReport = ({ entradas, salidas, detalleEfectivo }: PDFReportProps) => {
   const entradasAgrupadas = agruparPorConcepto(entradas);
   const salidasAgrupadas = agruparPorConcepto(salidas);
 
+  console.log(detalleEfectivo)
+
   const totalEntradas = Object.values(entradasAgrupadas).reduce(
     (acc, val) => acc + val,
     0

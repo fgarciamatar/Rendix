@@ -2,9 +2,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 
-import ConfirmacionMovimientoModal from "./ConfirmacionMovimientoModal/ConfirmacionMovimientoModal";
 import { useCajaStore } from "@/app/stores/useCajaStore";
-import { CiBookmarkCheck } from "react-icons/ci";
+import { LiaMoneyBillWaveAltSolid } from "react-icons/lia";
+import ConfirmacionMovimientoModal from "./ConfirmacionMovimientoModal/ConfirmacionMovimientoModal";
 
 interface Props {
   isOpen: boolean;
@@ -13,6 +13,8 @@ interface Props {
     tipo: "Entrada" | "Salida";
     concepto: string;
     monto: number;
+    efectivo: boolean;
+    detalleEfectivo: boolean;
   }) => void;
 }
 
@@ -22,12 +24,17 @@ const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
   const [tipo, setTipo] = useState("Entrada");
   const [concepto, setConcepto] = useState("");
   const [cantidades, setCantidades] = useState<{ [key: number]: number }>({});
+  const [efectivo, setEfectivo] = useState(true);
+  const [detalleEfectivo, setDetalleEfectivo] = useState(false);
   const [modalConfirmacion, setModalConfirmacion] = useState(false);
 
   const conceptoRef = useRef<HTMLInputElement>(null);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
-  const setDetalleEfectivo = useCajaStore((state) => state.setDetalleEfectivo);
+  const setDetalleEfectivoStore = useCajaStore(
+    (state) => state.setDetalleEfectivo
+  );
+  
 
   const handleCantidadChange = (denominacion: number, valor: string) => {
     const cantidad = parseInt(valor) || 0;
@@ -43,21 +50,26 @@ const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
   const handleClose = () => {
     setConcepto("");
     setCantidades({});
+    setDetalleEfectivo(false);
     onClose();
   };
 
   const handleSave = () => {
     if (!concepto || totalGeneral === 0) return;
+    setEfectivo(true);
     onSave({
       tipo: tipo as "Entrada" | "Salida",
       concepto,
       monto: totalGeneral,
+      efectivo,
+      detalleEfectivo,
     });
     handleClose();
   };
 
   const handleAgregarADetalle = () => {
-    setDetalleEfectivo(cantidades);
+    setDetalleEfectivoStore(cantidades);
+    setDetalleEfectivo(true);
     setModalConfirmacion(true);
   };
 
@@ -173,10 +185,8 @@ const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
                 onClick={handleAgregarADetalle}
                 className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
               >
-                <CiBookmarkCheck className="text-lg" />
-                <span className="text-sm">
-                  Agregar a detalle de efectivo
-                </span>
+                <LiaMoneyBillWaveAltSolid  size={22} className="text-green-400" />
+                <span className="text-sm">Agregar a detalle de efectivo</span>
               </button>
 
               <button

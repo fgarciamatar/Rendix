@@ -5,6 +5,8 @@ import { persist } from "zustand/middleware";
 interface Movimiento {
   concepto: string;
   monto: number;
+  efectivo: boolean;
+  detalleEfectivo: boolean;
 }
 
 interface EstadoCaja {
@@ -17,12 +19,19 @@ interface EstadoCaja {
 interface CajaState {
   entradas: Movimiento[];
   salidas: Movimiento[];
-  detalleEfectivo: Record<string, number>;
-  agregarMovimiento: (concepto: string, monto: number, tipo: "Entrada" | "Salida") => void;
+  detalleEfectivoState: Record<string, number>;
+  agregarMovimiento: (
+    concepto: string,
+    monto: number,
+    tipo: "Entrada" | "Salida",
+    efectivo: boolean,
+    detalleEfectivo: boolean
+  ) => void;
+
   EliminarMovimiento1: (concepto: string) => void;
   setDetalleEfectivo: (detalle: Record<string, number>) => void;
   estadoCaja: () => EstadoCaja;
-  eliminarMovimiento: (esEntrada: boolean, index: number) => void; 
+  // eliminarMovimiento: (esEntrada: boolean, index: number) => void;
 }
 
 export const useCajaStore = create(
@@ -30,30 +39,53 @@ export const useCajaStore = create(
     (set, get) => ({
       entradas: [],
       salidas: [],
-      detalleEfectivo: {},
-
-      agregarMovimiento: (concepto, monto, tipo) =>
+      detalleEfectivoState: {},
+      agregarMovimiento: (concepto, monto, tipo, efectivo, detalleEfectivo) =>
         set((state) => {
+          const nuevoMovimiento = {
+            concepto,
+            monto,
+            efectivo,
+            detalleEfectivo,
+          };
           if (tipo === "Entrada") {
-            return { entradas: [...state.entradas, { concepto, monto }] };
+            return { entradas: [...state.entradas, nuevoMovimiento] };
           } else {
-            return { salidas: [...state.salidas, { concepto, monto }] };
+            return { salidas: [...state.salidas, nuevoMovimiento] };
           }
         }),
 
       EliminarMovimiento1: (concepto) =>
-        set((state) => ({
-          entradas: state.entradas.filter((m) => m.concepto !== concepto),
-          salidas: state.salidas.filter((m) => m.concepto !== concepto),
-        })),
+        set((state) => {
+          // Buscar el movimiento en entradas y salidas
+          const movimientoEntrada = state.entradas.find(
+            (m) => m.concepto === concepto
+          );
+          const movimientoSalida = state.salidas.find(
+            (m) => m.concepto === concepto
+          );
+
+          const seDebeEliminarDetalle =
+            (movimientoEntrada && movimientoEntrada.efectivo) ||
+            (movimientoSalida && movimientoSalida.efectivo);
+
+          return {
+            entradas: state.entradas.filter((m) => m.concepto !== concepto),
+            salidas: state.salidas.filter((m) => m.concepto !== concepto),
+            detalleEfectivo: seDebeEliminarDetalle ? {} : state.detalleEfectivoState,
+          };
+        }),
 
       setDetalleEfectivo: (detalle) =>
         set(() => ({
-          detalleEfectivo: detalle,
+          detalleEfectivoState: detalle,
         })),
 
       estadoCaja: () => {
-        const totalEntradas = get().entradas.reduce((acc, m) => acc + m.monto, 0);
+        const totalEntradas = get().entradas.reduce(
+          (acc, m) => acc + m.monto,
+          0
+        );
         const totalSalidas = get().salidas.reduce((acc, m) => acc + m.monto, 0);
         const diferencia = Math.abs(totalEntradas - totalSalidas);
 
@@ -68,21 +100,6 @@ export const useCajaStore = create(
           totalSalidas,
         };
       },
-
-      eliminarMovimiento: (esEntrada, index) => {
-        set((state) => {
-          if (esEntrada) {
-            const nuevasEntradas = [...state.entradas];
-            nuevasEntradas.splice(index, 1);
-            return { entradas: nuevasEntradas };
-          } else {
-            const nuevasSalidas = [...state.salidas];
-            nuevasSalidas.splice(index, 1);
-            return { salidas: nuevasSalidas };
-          }
-        });
-      },
-      
     }),
     {
       name: "caja-storage",
