@@ -100,7 +100,7 @@ export default function CajaClient() {
 
         <button
           onClick={() => setModalEfectivo(true)}
-          style={{ backgroundColor: "#3D9970" }} // Verde tipo dólar
+          style={{ backgroundColor: "#3D9970" }}
           className="flex items-center justify-center gap-2 hover:brightness-110 text-white px-5 py-3 text-base md:text-lg rounded-lg shadow w-full md:w-auto"
         >
           <BsCurrencyDollar size={22} /> Agregar Efectivo (Ctrl + Q)

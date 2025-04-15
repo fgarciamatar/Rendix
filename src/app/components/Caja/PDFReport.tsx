@@ -1,17 +1,53 @@
-"use client";
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import { useCajaStore } from "../../stores/useCajaStore";
-
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 const styles = StyleSheet.create({
   page: { padding: 40, fontSize: 12, fontFamily: "Helvetica" },
-  title: { fontSize: 22, textAlign: "center", marginBottom: 20, fontWeight: "bold" },
-  section: { flexDirection: "row", justifyContent: "space-between", marginBottom: 20 },
-  box: { width: "48%", padding: 12, border: "1px solid black", borderRadius: 5 },
-  subtitle: { fontSize: 16, marginBottom: 8, fontWeight: "bold", textDecoration: "underline" },
-  item: { flexDirection: "row", justifyContent: "space-between", marginVertical: 2 },
-  totalBox: { marginTop: 20, padding: 10, borderTop: "2px solid black" },
-  totalText: { fontSize: 14, fontWeight: "bold", textAlign: "right" },
-  efectivoBox: { marginTop: 30, padding: 12, border: "1px solid black", borderRadius: 5 },
+  title: {
+    fontSize: 22,
+    textAlign: "center",
+    marginBottom: 20,
+    fontWeight: 700,
+  },
+  section: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  box: {
+    width: "48%",
+    padding: 12,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "black",
+    borderRadius: 5,
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: 700,
+    // textDecoration: "underline",
+  },
+  item: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  totalBox: {
+    marginTop: 20,
+    padding: 10,
+    borderTopWidth: 2,
+    borderTopStyle: "solid",
+    borderTopColor: "black",
+  },
+  totalText: { fontSize: 14, fontWeight: 700, textAlign: "right" },
+  efectivoBox: {
+    marginTop: 30,
+    padding: 12,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "black",
+    borderRadius: 5,
+  },
 });
 
 interface Movimiento {
@@ -19,7 +55,15 @@ interface Movimiento {
   monto: number;
 }
 
-const agruparPorConcepto = (movimientos: Movimiento[]): Record<string, number> => {
+interface PDFReportProps {
+  entradas: Movimiento[];
+  salidas: Movimiento[];
+  detalleEfectivo: Record<string, number>;
+}
+
+const agruparPorConcepto = (
+  movimientos: Movimiento[]
+): Record<string, number> => {
   const agrupado: Record<string, number> = {};
   movimientos.forEach(({ concepto, monto }) => {
     agrupado[concepto] = (agrupado[concepto] || 0) + monto;
@@ -27,18 +71,25 @@ const agruparPorConcepto = (movimientos: Movimiento[]): Record<string, number> =
   return agrupado;
 };
 
-const PDFReport = () => {
-  const entradas = useCajaStore((state) => state.entradas);
-  const salidas = useCajaStore((state) => state.salidas);
-  const detalleEfectivo = useCajaStore((state) => state.detalleEfectivo);
-
+const PDFReport = ({ entradas, salidas, detalleEfectivo }: PDFReportProps) => {
   const entradasAgrupadas = agruparPorConcepto(entradas);
   const salidasAgrupadas = agruparPorConcepto(salidas);
 
-  const totalEntradas = Object.values(entradasAgrupadas).reduce((acc, val) => acc + val, 0);
-  const totalSalidas = Object.values(salidasAgrupadas).reduce((acc, val) => acc + val, 0);
+  const totalEntradas = Object.values(entradasAgrupadas).reduce(
+    (acc, val) => acc + val,
+    0
+  );
+  const totalSalidas = Object.values(salidasAgrupadas).reduce(
+    (acc, val) => acc + val,
+    0
+  );
   const diferencia = Math.abs(totalEntradas - totalSalidas);
-  const estado = totalEntradas > totalSalidas ? "Sobrante" : totalSalidas > totalEntradas ? "Faltante" : "Sin diferencias";
+  const estado =
+    totalEntradas > totalSalidas
+      ? "Sobrante"
+      : totalSalidas > totalEntradas
+      ? "Faltante"
+      : "Sin diferencias";
 
   const totalEfectivo = Object.entries(detalleEfectivo).reduce(
     (acc, [den, cant]) => acc + Number(den) * cant,
@@ -59,18 +110,25 @@ const PDFReport = () => {
                 <Text>${monto.toFixed(2)}</Text>
               </View>
             ))}
-            <Text style={styles.totalText}>Subtotal: ${totalEntradas.toFixed(2)}</Text>
+            <Text style={styles.totalText}>
+              Subtotal: ${totalEntradas.toFixed(2)}
+            </Text>
           </View>
 
           <View style={styles.box}>
             <Text style={styles.subtitle}>Salidas</Text>
-            {Object.entries(salidasAgrupadas).map(([concepto, monto]) => (
-              <View key={concepto} style={styles.item}>
-                <Text>{concepto}</Text>
-                <Text>${monto.toFixed(2)}</Text>
-              </View>
-            ))}
-            <Text style={styles.totalText}>Subtotal: ${totalSalidas.toFixed(2)}</Text>
+            {Object.entries(entradasAgrupadas).map(
+              ([concepto, monto], index) => (
+                <View key={concepto || `entrada-${index}`} style={styles.item}>
+                  <Text>{concepto || "Sin concepto"}</Text>
+                  <Text>${monto.toFixed(2)}</Text>
+                </View>
+              )
+            )}
+
+            <Text style={styles.totalText}>
+              Subtotal: ${totalSalidas.toFixed(2)}
+            </Text>
           </View>
         </View>
 
@@ -93,7 +151,9 @@ const PDFReport = () => {
                   <Text>${(Number(den) * cant).toLocaleString()}</Text>
                 </View>
               ))}
-            <Text style={styles.totalText}>Total efectivo: ${totalEfectivo.toLocaleString()}</Text>
+            <Text style={styles.totalText}>
+              Total efectivo: ${totalEfectivo.toLocaleString()}
+            </Text>
           </View>
         )}
       </Page>

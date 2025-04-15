@@ -17,11 +17,12 @@ interface EstadoCaja {
 interface CajaState {
   entradas: Movimiento[];
   salidas: Movimiento[];
-  detalleEfectivo: Record<string, number>; // agregado
+  detalleEfectivo: Record<string, number>;
   agregarMovimiento: (concepto: string, monto: number, tipo: "Entrada" | "Salida") => void;
-  limpiarCaja: (concepto: string) => void;
-  setDetalleEfectivo: (detalle: Record<string, number>) => void; // agregado
+  EliminarMovimiento1: (concepto: string) => void;
+  setDetalleEfectivo: (detalle: Record<string, number>) => void;
   estadoCaja: () => EstadoCaja;
+  eliminarMovimiento: (esEntrada: boolean, index: number) => void; 
 }
 
 export const useCajaStore = create(
@@ -29,7 +30,8 @@ export const useCajaStore = create(
     (set, get) => ({
       entradas: [],
       salidas: [],
-      detalleEfectivo: {}, // inicializado
+      detalleEfectivo: {},
+
       agregarMovimiento: (concepto, monto, tipo) =>
         set((state) => {
           if (tipo === "Entrada") {
@@ -38,23 +40,26 @@ export const useCajaStore = create(
             return { salidas: [...state.salidas, { concepto, monto }] };
           }
         }),
-      limpiarCaja: (concepto) =>
+
+      EliminarMovimiento1: (concepto) =>
         set((state) => ({
           entradas: state.entradas.filter((m) => m.concepto !== concepto),
           salidas: state.salidas.filter((m) => m.concepto !== concepto),
         })),
+
       setDetalleEfectivo: (detalle) =>
         set(() => ({
           detalleEfectivo: detalle,
         })),
+
       estadoCaja: () => {
         const totalEntradas = get().entradas.reduce((acc, m) => acc + m.monto, 0);
         const totalSalidas = get().salidas.reduce((acc, m) => acc + m.monto, 0);
         const diferencia = Math.abs(totalEntradas - totalSalidas);
 
         let estado: EstadoCaja["estado"] = "balanceado";
-        if (totalEntradas > totalSalidas) estado = "sobrante";
-        else if (totalSalidas > totalEntradas) estado = "faltante";
+        if (totalEntradas > totalSalidas) estado = "faltante";
+        else if (totalSalidas > totalEntradas) estado = "sobrante";
 
         return {
           total: diferencia,
@@ -63,6 +68,21 @@ export const useCajaStore = create(
           totalSalidas,
         };
       },
+
+      eliminarMovimiento: (esEntrada, index) => {
+        set((state) => {
+          if (esEntrada) {
+            const nuevasEntradas = [...state.entradas];
+            nuevasEntradas.splice(index, 1);
+            return { entradas: nuevasEntradas };
+          } else {
+            const nuevasSalidas = [...state.salidas];
+            nuevasSalidas.splice(index, 1);
+            return { salidas: nuevasSalidas };
+          }
+        });
+      },
+      
     }),
     {
       name: "caja-storage",

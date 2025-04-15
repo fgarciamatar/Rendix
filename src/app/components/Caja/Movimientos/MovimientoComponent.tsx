@@ -2,21 +2,29 @@
 "use client";
 
 import { RiDeleteBinLine } from "react-icons/ri";
-import { movimientosProps } from "./types";
 import { useCajaStore } from "../../../stores/useCajaStore";
+import { movimientosProps } from "./types";
+import { useState } from "react";
+import ConfirmacionMovimientoModal from "./../EliminarMovimientoModal"; 
 
 export default function MovimientoComponent({
   titulo,
   descripcion,
   esEntrada,
 }: movimientosProps) {
-  const limpiarCaja = useCajaStore((state) => state.limpiarCaja);
+  const [eliminarModal, setEliminarModal] = useState(false);
+  const [conceptoSeleccionado, setConceptoSeleccionado] = useState<string | null>(null);
+
+  const eliminarMovimiento = useCajaStore((state) => state.EliminarMovimiento1);
 
   const movimientos = useCajaStore((state) =>
     esEntrada ? state.entradas : state.salidas
   );
 
-  const total = movimientos.reduce((acc, mov) => acc + mov.monto, 0);
+  const total = movimientos.reduce(
+    (acc, mov) => acc + (typeof mov.monto === "number" ? mov.monto : 0),
+    0
+  );
 
   return (
     <div className="border border-gray-500 p-6 rounded-xl bg-transparent w-full">
@@ -41,10 +49,17 @@ export default function MovimientoComponent({
             className="grid grid-cols-3 items-center gap-2 border-b border-gray-700 py-3 hover:bg-gray-800 transition rounded-md text-lg min-h-[56px]"
           >
             <p className="pl-2">{mov.concepto}</p>
-            <p className="text-center">${mov.monto.toFixed(2)}</p>
+            <p className="text-center">
+              {typeof mov.monto === "number"
+                ? `$${mov.monto.toLocaleString("es-AR")}`
+                : "$—"}
+            </p>
             <div className="flex justify-center">
               <button
-                onClick={() => limpiarCaja(mov.concepto)}
+                onClick={() => {
+                  setConceptoSeleccionado(mov.concepto);
+                  setEliminarModal(true);
+                }}
                 className="text-red-500 hover:text-red-400 transition-transform transform hover:scale-125 cursor-pointer"
               >
                 <RiDeleteBinLine size={20} />
@@ -59,10 +74,20 @@ export default function MovimientoComponent({
         <h2 className="text-3xl font-black">
           Total:{" "}
           <span className={esEntrada ? "text-green-400" : "text-red-400"}>
-            ${total.toFixed(2)}
+            ${total.toLocaleString("es-AR")}
           </span>
         </h2>
       </div>
+
+      {/* Modal de confirmación */}
+      <ConfirmacionMovimientoModal
+        isOpen={eliminarModal}
+        onClose={() => setEliminarModal(false)}
+        onConfirm={() => {
+          if (conceptoSeleccionado) eliminarMovimiento(conceptoSeleccionado);
+          setEliminarModal(false);
+        }}
+      />
     </div>
   );
 }

@@ -1,21 +1,31 @@
-import React, { useRef, useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+"use client";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
 
+import ConfirmacionMovimientoModal from "./ConfirmacionMovimientoModal/ConfirmacionMovimientoModal";
 import { useCajaStore } from "@/app/stores/useCajaStore";
+import { CiBookmarkCheck } from "react-icons/ci";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: { tipo: "Entrada" | "Salida"; concepto: string; monto: number }) => void;
+  onSave: (data: {
+    tipo: "Entrada" | "Salida";
+    concepto: string;
+    monto: number;
+  }) => void;
 }
 
-const denominaciones = [20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10];
+const denominaciones = [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10];
 
-const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
+const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
   const [tipo, setTipo] = useState("Entrada");
   const [concepto, setConcepto] = useState("");
   const [cantidades, setCantidades] = useState<{ [key: number]: number }>({});
+  const [modalConfirmacion, setModalConfirmacion] = useState(false);
+
   const conceptoRef = useRef<HTMLInputElement>(null);
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const setDetalleEfectivo = useCajaStore((state) => state.setDetalleEfectivo);
 
@@ -25,7 +35,10 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
   };
 
   const totalPorDenominacion = (den: number) => (cantidades[den] || 0) * den;
-  const totalGeneral = denominaciones.reduce((sum, den) => sum + totalPorDenominacion(den), 0);
+  const totalGeneral = denominaciones.reduce(
+    (sum, den) => sum + totalPorDenominacion(den),
+    0
+  );
 
   const handleClose = () => {
     setConcepto("");
@@ -35,9 +48,28 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
 
   const handleSave = () => {
     if (!concepto || totalGeneral === 0) return;
-    onSave?.({ tipo: tipo as "Entrada" | "Salida", concepto, monto: totalGeneral });
-    setDetalleEfectivo(cantidades)
+    onSave({
+      tipo: tipo as "Entrada" | "Salida",
+      concepto,
+      monto: totalGeneral,
+    });
     handleClose();
+  };
+
+  const handleAgregarADetalle = () => {
+    setDetalleEfectivo(cantidades);
+    setModalConfirmacion(true);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (index < denominaciones.length - 1) {
+        inputRefs.current[index + 1]?.focus();
+      } else {
+        handleSave();
+      }
+    }
   };
 
   useEffect(() => {
@@ -55,6 +87,7 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          key="efectivo-modal"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -65,7 +98,7 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-gray-900 text-white p-6 rounded-lg w-[90%] max-w-xl shadow-xl max-h-[90vh] overflow-hidden"
+            className="bg-gray-900 text-white p-6 rounded-lg w-[90%] max-w-xl shadow-xl max-h-[90vh] overflow-y-auto"
           >
             <h2 className="text-2xl font-bold mb-2">Conteo de Efectivo</h2>
             <p className="text-sm text-gray-400 mb-4">
@@ -79,6 +112,9 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
                   value={tipo}
                   onChange={(e) => setTipo(e.target.value)}
                   className="bg-gray-800 text-white px-3 py-2 rounded"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") conceptoRef.current?.focus();
+                  }}
                 >
                   <option value="Entrada">Entrada</option>
                   <option value="Salida">Salida</option>
@@ -91,20 +127,32 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
                   ref={conceptoRef}
                   value={concepto}
                   onChange={(e) => setConcepto(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") inputRefs.current[0]?.focus();
+                  }}
                   className="bg-gray-800 text-white px-3 py-2 rounded"
                   placeholder="Ej: Ingreso de efectivo"
                 />
               </div>
 
               <div className="overflow-y-auto max-h-64 border-t border-gray-700 pt-2 pr-2 custom-scroll">
-                {denominaciones.map((den) => (
-                  <div key={den} className="flex justify-between items-center py-1 text-sm">
+                {denominaciones.map((den, index) => (
+                  <div
+                    key={`den-${den}-${index}`}
+                    className="flex justify-between items-center py-1 text-sm"
+                  >
                     <div className="w-1/3">${den.toLocaleString()}</div>
                     <input
                       type="number"
                       min="0"
                       value={cantidades[den] || ""}
-                      onChange={(e) => handleCantidadChange(den, e.target.value)}
+                      onChange={(e) =>
+                        handleCantidadChange(den, e.target.value)
+                      }
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                      ref={(el) => {
+                        inputRefs.current[index] = el;
+                      }}
                       className="w-1/3 bg-gray-800 text-white text-center rounded px-2 py-1"
                     />
                     <div className="w-1/3 text-right">
@@ -122,6 +170,16 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
 
             <div className="flex justify-end mt-6 space-x-2">
               <button
+                onClick={handleAgregarADetalle}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
+              >
+                <CiBookmarkCheck className="text-lg" />
+                <span className="text-sm">
+                  Agregar a detalle de efectivo
+                </span>
+              </button>
+
+              <button
                 onClick={handleClose}
                 className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
               >
@@ -137,8 +195,15 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
           </motion.div>
         </motion.div>
       )}
+
+      <ConfirmacionMovimientoModal
+        key="confirmacion-modal"
+        isOpen={modalConfirmacion}
+        onClose={() => setModalConfirmacion(false)}
+        mensaje="Detalle de efectivo guardado correctamente"
+      />
     </AnimatePresence>
   );
 };
 
-export default NuevoMovimientoModal;
+export default EfectivoModal;

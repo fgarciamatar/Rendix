@@ -9,7 +9,7 @@ interface Props {
   mensaje?: string;
 }
 
-const ConfirmacionMovimientoModal: React.FC<Props> = ({ isOpen, onClose, mensaje }) => {
+const ConfirmacionModal: React.FC<Props> = ({ isOpen, onClose, mensaje }) => {
   const [visible, setVisible] = useState(isOpen);
 
   useEffect(() => {
@@ -51,4 +51,4 @@ const ConfirmacionMovimientoModal: React.FC<Props> = ({ isOpen, onClose, mensaje
   );
 };
 
-export default ConfirmacionMovimientoModal;
+export default ConfirmacionModal;

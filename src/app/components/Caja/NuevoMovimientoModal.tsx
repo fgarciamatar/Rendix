@@ -1,9 +1,14 @@
-import React, { useRef, useState, useEffect } from "react";
+"use client"
+import React, { useEffect, useRef, useState } from "react";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: { tipo: "Entrada" | "Salida"; concepto: string; monto: number }) => void;
+  onSave: (data: {
+    tipo: "Entrada" | "Salida";
+    concepto: string;
+    monto: number;
+  }) => void;
 }
 
 const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
@@ -15,8 +20,8 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
   const montoRef = useRef<HTMLInputElement>(null);
   const guardarRef = useRef<HTMLButtonElement>(null);
 
-   // Resetear campos al cerrar modal
-   const handleClose = () => {
+  // Resetear campos al cerrar modal
+  const handleClose = () => {
     setTipo("Salida");
     setConcepto("");
     setMonto("");
@@ -32,8 +37,7 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
         monto: Number(monto),
       });
     }
-    
-    
+
     handleClose();
   };
 
@@ -86,7 +90,9 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
               className="w-full px-3 py-2 bg-gray-800 text-white rounded"
               value={tipo}
               onChange={(e) => setTipo(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, conceptoRef as React.RefObject<HTMLElement>)}
+              onKeyDown={(e) =>
+                handleKeyDown(e, conceptoRef as React.RefObject<HTMLElement>)
+              }
             >
               <option value="Entrada">Entrada</option>
               <option value="Salida">Salida</option>
@@ -100,7 +106,9 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
               className="w-full px-3 py-2 bg-gray-800 text-white rounded"
               value={concepto}
               onChange={(e) => setConcepto(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, montoRef as React.RefObject<HTMLElement>)}
+              onKeyDown={(e) =>
+                handleKeyDown(e, montoRef as React.RefObject<HTMLElement>)
+              }
             />
           </div>
           <div>
@@ -110,8 +118,18 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
               type="number"
               className="w-full px-3 py-2 bg-gray-800 text-white rounded"
               value={monto}
-              onChange={(e) => setMonto(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, guardarRef as React.RefObject<HTMLElement>)}
+              onChange={(e) => {
+                const sanitized = e.target.value.replace(/[.,]/g, "");
+                setMonto(sanitized);
+              }}
+              onKeyDown={(e) => {
+                // Bloquear "." y ","
+                if (e.key === "." || e.key === ",") {
+                  e.preventDefault();
+                } else {
+                  handleKeyDown(e, guardarRef as React.RefObject<HTMLElement>);
+                }
+              }}
             />
           </div>
         </div>
