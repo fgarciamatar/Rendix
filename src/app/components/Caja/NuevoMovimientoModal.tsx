@@ -1,50 +1,65 @@
-"use client"
+"use client";
 import React, { useEffect, useRef, useState } from "react";
+import { TbMoneybag } from "react-icons/tb";
+import { useCajaStore } from "@/app/stores/useCajaStore";
+import ConfirmacionMovimientoModal from "./ConfirmacionMovimientoModal/ConfirmacionMovimientoModal";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: {
-    tipo: "Entrada" | "Salida";
     concepto: string;
     monto: number;
-    efectivo: boolean,
-    detalleEfectivo: boolean
+    tipoMovimiento: "Entrada" | "Salida";
+    tipoConcepto: "Efectivo" | "Venta" | "Movimiento";
+    detalleEfectivo: boolean;
   }) => void;
 }
+ 
 
 const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
-  const [tipo, setTipo] = useState("Salida");
   const [concepto, setConcepto] = useState("");
   const [monto, setMonto] = useState<number | string>("");
-  const [efectivo, setEfectivo] = useState(false);
-  const [detalleEfectivo, setDetalleEfectivo] = useState(false);
+  const [tipoMovimiento, setTipoMovimiento] = useState("Salida");
+  const [tipoConcepto, setTipoConcepto] = useState<
+    "Efectivo" | "Venta" | "Movimiento"
+  >("Movimiento");
+ const [detalleEfectivo, setDetalleEfectivo] = useState(false);
+   const [modalConfirmacion, setModalConfirmacion] = useState(false);
+
+ const entradas = useCajaStore((state) => state.entradas);
+const salidas = useCajaStore((state) => state.salidas);
+
+const hayVenta = [...entradas, ...salidas].some(
+  (mov) => mov.tipoConcepto === "Venta"
+);
 
   const conceptoRef = useRef<HTMLInputElement>(null);
   const montoRef = useRef<HTMLInputElement>(null);
   const guardarRef = useRef<HTMLButtonElement>(null);
+  console.log("tipoMOv",tipoMovimiento , tipoConcepto);
+  
 
   // Resetear campos al cerrar modal
   const handleClose = () => {
-    setTipo("Salida");
+    setTipoMovimiento("Salida");
     setConcepto("");
     setMonto("");
-    setEfectivo(false)
-    setDetalleEfectivo(false)
+    setDetalleEfectivo(false);
+    setTipoConcepto("Movimiento")
     onClose();
   };
 
   const handleSave = () => {
     if (!concepto || !monto) return;
-    if (tipo === "Entrada" || tipo === "Salida") {
-      setEfectivo(false)
-      setDetalleEfectivo(false)
+    if (tipoMovimiento === "Entrada" || tipoMovimiento === "Salida") {
+      setDetalleEfectivo(false);
       onSave?.({
-        tipo,
         concepto,
         monto: Number(monto),
-        efectivo,
-        detalleEfectivo
+        tipoMovimiento: tipoMovimiento,
+        tipoConcepto: tipoConcepto, 
+        detalleEfectivo,
       });
     }
 
@@ -63,6 +78,10 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
         next.current.focus();
       }
     }
+  };
+  const handleAgregarVenta = () => {
+   setTipoConcepto("Venta")
+    setModalConfirmacion(true);
   };
 
   // Cerrar con Escape
@@ -98,10 +117,9 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
             <label className="block mb-1">Tipo</label>
             <select
               className="w-full px-3 py-2 bg-gray-800 text-white rounded"
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}
-              onKeyDown={(e) =>
-                handleKeyDown(e, conceptoRef as React.RefObject<HTMLElement>)
+              value={tipoMovimiento}
+              onChange={(e) =>
+                setTipoMovimiento(e.target.value as "Entrada" | "Salida")
               }
             >
               <option value="Entrada">Entrada</option>
@@ -145,6 +163,29 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
         </div>
 
         <div className="flex justify-end mt-6 space-x-2">
+           <div className="flex flex-col items-end space-y-1">
+                          <button
+                            onClick={handleAgregarVenta}
+                            disabled={hayVenta}
+                            className={`flex items-center gap-2 px-4 py-2 rounded transition ${
+                              hayVenta
+                                ? "bg-gray-500 cursor-not-allowed"
+                                : "bg-gray-700 hover:bg-gray-600"
+                            }`}
+                          >
+                            <TbMoneybag 
+                              size={22}
+                              className="text-green-400"
+                            />
+                            <span className="text-sm">Agregar Total de Venta</span>
+                          </button>
+          
+                          {hayVenta && (
+                            <span className="text-xs text-red-400">
+                              Ya se ha agregado una venta.
+                            </span>
+                          )}
+                        </div>
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
@@ -160,7 +201,15 @@ const NuevoMovimientoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
           </button>
         </div>
       </div>
+      
+      <ConfirmacionMovimientoModal
+        key="confirmacion-modal"
+        isOpen={modalConfirmacion}
+        onClose={() => setModalConfirmacion(false)}
+        mensaje="Venta guardada correctamente"
+      />
     </div>
+    
   );
 };
 

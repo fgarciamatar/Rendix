@@ -10,10 +10,10 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: {
-    tipo: "Entrada" | "Salida";
     concepto: string;
     monto: number;
-    efectivo: boolean;
+    tipoMovimiento: "Entrada" | "Salida";
+    tipoConcepto: "Efectivo" | "Venta" | "Movimiento";
     detalleEfectivo: boolean;
   }) => void;
 }
@@ -21,20 +21,26 @@ interface Props {
 const denominaciones = [20000, 10000, 2000, 1000, 500, 200, 100, 50, 20, 10];
 
 const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
-  const [tipo, setTipo] = useState("Entrada");
   const [concepto, setConcepto] = useState("");
   const [cantidades, setCantidades] = useState<{ [key: number]: number }>({});
-  const [efectivo, setEfectivo] = useState(true);
+  const [tipoMovimiento, setTipoMovimiento] = useState("Salida");
+  const [tipoConcepto, setTipoConcepto] = useState<
+    "Efectivo" | "Venta" | "Movimiento"
+  >("Efectivo");
   const [detalleEfectivo, setDetalleEfectivo] = useState(false);
   const [modalConfirmacion, setModalConfirmacion] = useState(false);
+
+  const entradas = useCajaStore((state) => state.entradas);
+  const salidas = useCajaStore((state) => state.salidas);
+  const setDetalleEfectivoState = useCajaStore((state) => state.setDetalleEfectivoState);
+  const existeDetalleEfectivo =
+    entradas.some((mov) => mov.detalleEfectivo) ||
+    salidas.some((mov) => mov.detalleEfectivo);
 
   const conceptoRef = useRef<HTMLInputElement>(null);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
-  const setDetalleEfectivoStore = useCajaStore(
-    (state) => state.setDetalleEfectivo
-  );
-  
+
 
   const handleCantidadChange = (denominacion: number, valor: string) => {
     const cantidad = parseInt(valor) || 0;
@@ -48,27 +54,31 @@ const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
   );
 
   const handleClose = () => {
+    onClose();
     setConcepto("");
     setCantidades({});
+    setTipoMovimiento("Salida");
+    setTipoConcepto("Efectivo");
     setDetalleEfectivo(false);
-    onClose();
   };
 
   const handleSave = () => {
     if (!concepto || totalGeneral === 0) return;
-    setEfectivo(true);
-    onSave({
-      tipo: tipo as "Entrada" | "Salida",
-      concepto,
-      monto: totalGeneral,
-      efectivo,
-      detalleEfectivo,
-    });
+    if (tipoMovimiento === "Entrada" || tipoMovimiento === "Salida") {
+      setTipoConcepto("Efectivo");
+      onSave?.({
+        concepto,
+        monto: Number(totalGeneral),
+        tipoMovimiento: tipoMovimiento,
+        tipoConcepto: tipoConcepto,
+        detalleEfectivo,
+      });
+    }
     handleClose();
   };
 
   const handleAgregarADetalle = () => {
-    setDetalleEfectivoStore(cantidades);
+    setDetalleEfectivoState(cantidades);
     setDetalleEfectivo(true);
     setModalConfirmacion(true);
   };
@@ -121,8 +131,8 @@ const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
               <div className="flex flex-col">
                 <label className="mb-1 text-sm">Tipo</label>
                 <select
-                  value={tipo}
-                  onChange={(e) => setTipo(e.target.value)}
+                  value={tipoMovimiento}
+                  onChange={(e) => setTipoMovimiento(e.target.value)}
                   className="bg-gray-800 text-white px-3 py-2 rounded"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") conceptoRef.current?.focus();
@@ -181,13 +191,29 @@ const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
             </div>
 
             <div className="flex justify-end mt-6 space-x-2">
-              <button
-                onClick={handleAgregarADetalle}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
-              >
-                <LiaMoneyBillWaveAltSolid  size={22} className="text-green-400" />
-                <span className="text-sm">Agregar a detalle de efectivo</span>
-              </button>
+              <div className="flex flex-col items-end space-y-1">
+                <button
+                  onClick={handleAgregarADetalle}
+                  disabled={existeDetalleEfectivo}
+                  className={`flex items-center gap-2 px-4 py-2 rounded transition ${
+                    existeDetalleEfectivo
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "bg-gray-700 hover:bg-gray-600"
+                  }`}
+                >
+                  <LiaMoneyBillWaveAltSolid
+                    size={22}
+                    className="text-green-400"
+                  />
+                  <span className="text-sm">Agregar a detalle de efectivo</span>
+                </button>
+
+                {existeDetalleEfectivo && (
+                  <span className="text-xs text-red-400">
+                    Ya se ha agregado un detalle de efectivo.
+                  </span>
+                )}
+              </div>
 
               <button
                 onClick={handleClose}

@@ -5,13 +5,16 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 //REACT ICON
+import { AiTwotoneDelete } from "react-icons/ai";
 import { BsCurrencyDollar } from "react-icons/bs";
 import { CiCirclePlus } from "react-icons/ci";
+import { LuSave } from "react-icons/lu";
 
 //MODAL
 import ConfirmacionMovimientoModal from "../../components/Caja/ConfirmacionMovimientoModal/ConfirmacionMovimientoModal";
 import EfectivoModal from "../../components/Caja/EfectivoModal";
 import NuevoMovimientoModal from "../../components/Caja/NuevoMovimientoModal";
+import LimpiarModal from "./../../components/Caja/EliminarMovimientoModal";
 
 const PDFButtonClient = dynamic(
   () => import("../../components/Caja/PDFButtonClient/PDFButtonClient"),
@@ -21,29 +24,69 @@ const PDFButtonClient = dynamic(
 export default function CajaClient() {
   //ESTADO GLOBAL
   const agregarMovimiento = useCajaStore((state) => state.agregarMovimiento);
+  const entradas = useCajaStore((state) => state.entradas);
+  const salidas = useCajaStore((state) => state.salidas);
+  const detalleEfectivoState = useCajaStore(
+    (state) => state.detalleEfectivoState
+  );
+  const LimpiarPlanilla = useCajaStore((state) => state.LimpiarPlanilla);
+  const estadoCajaStateGlobal = useCajaStore((state) => state.estadoCaja);
+  const estadoDeCaja = estadoCajaStateGlobal();
 
   //ESTADO LOCAL
   const [fechaActual, setFechaActual] = useState("");
+  const [turno, setTurno] = useState("");
   const [modalAbierto, setModalAbierto] = useState(false);
   const [modalEfectivo, setModalEfectivo] = useState(false);
   const [modalConfirmacion, setModalConfirmacion] = useState(false);
+  const [modalLimpiarConfirmacion, setModalLimpiarConfirmacion] =
+    useState(false);
+  const [mostrarBotonPDF, setMostrarBotonPDF] = useState(false);
 
   //FUNCTIONS
   const handleGuardarMovimiento = (data: {
-    tipo: "Entrada" | "Salida";
     concepto: string;
     monto: number;
-    efectivo: boolean,
-    detalleEfectivo: boolean
+    tipoMovimiento: "Entrada" | "Salida";
+    tipoConcepto: "Efectivo" | "Venta" | "Movimiento";
+    detalleEfectivo: boolean;
   }) => {
-    agregarMovimiento(data.concepto, data.monto, data.tipo, data.efectivo, data.detalleEfectivo);
+    //concepto, monto, tipoMovimiento, tipoConcepto, detalleEfectivo
+    agregarMovimiento(
+      data.concepto,
+      data.monto,
+      data.tipoMovimiento,
+      data.tipoConcepto,
+      data.detalleEfectivo
+    );
     setModalConfirmacion(true);
   };
 
+  const handleGuardar = () => {
+    setMostrarBotonPDF(true); // Ahora se muestra el botón de PDF
+  };
+  const handleLimpiarPlanilla = () => {
+    setModalLimpiarConfirmacion(true);
+  };
   //USEEFECTS
   useEffect(() => {
-    const hoy = new Date().toISOString().split("T")[0];
-    setFechaActual(hoy);
+    const ahora = new Date();
+    const hora = ahora.getHours();
+    const minutos = ahora.getMinutes();
+
+    // Formatear fecha en formato YYYY-MM-DD
+    const fechaFormateada = ahora.toISOString().split("T")[0];
+    setFechaActual(fechaFormateada);
+
+    // Calcular turno
+    const tiempo = hora + minutos / 60;
+    if (tiempo >= 7 && tiempo < 16.5) {
+      setTurno("Mañana");
+    } else if (tiempo >= 16.5 && tiempo < 22) {
+      setTurno("Tarde");
+    } else {
+      setTurno("Noche");
+    }
   }, []);
 
   useEffect(() => {
@@ -89,6 +132,9 @@ export default function CajaClient() {
             readOnly
             className="bg-gray-800 text-white p-2 md:p-3 text-base md:text-lg rounded-md border border-gray-600"
           />
+          <span className="text-white text-base md:text-lg">
+            Turno: <strong>{turno}</strong>
+          </span>
         </div>
       </div>
 
@@ -107,8 +153,31 @@ export default function CajaClient() {
         >
           <BsCurrencyDollar size={22} /> Agregar Efectivo (Ctrl + Q)
         </button>
-
-        <PDFButtonClient />
+        <button
+          onClick={handleGuardar}
+          className="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-3 rounded-lg shadow flex gap-2 items-center"
+        >
+          <LuSave size={22} />
+          Guardar
+        </button>
+        {mostrarBotonPDF && (
+          <PDFButtonClient
+            fecha={fechaActual}
+            turno={turno}
+            entradas={entradas}
+            salidas={salidas}
+            detalleEfectivo={detalleEfectivoState}
+            estadoCaja={estadoDeCaja}
+            onDownloaded={() => setMostrarBotonPDF(false)}
+          />
+        )}
+        <button
+          onClick={handleLimpiarPlanilla}
+          className="bg-sky-600 hover:bg-sky-700 text-white px-5 py-3 rounded-lg shadow flex gap-2 items-center"
+        >
+          <AiTwotoneDelete size={22} />
+          Limpiar Planilla
+        </button>
       </div>
 
       <NuevoMovimientoModal
@@ -126,6 +195,16 @@ export default function CajaClient() {
       <ConfirmacionMovimientoModal
         isOpen={modalConfirmacion}
         onClose={() => setModalConfirmacion(false)}
+      />
+
+      <LimpiarModal
+        isOpen={modalLimpiarConfirmacion}
+        onClose={() => setModalLimpiarConfirmacion(false)}
+        onConfirm={() => {
+          LimpiarPlanilla();
+        }}
+        mensaje="¿Estás seguro que querés limpiar la Planilla? Esta acción no se puede deshacer."
+        botonConfirmar="Limpiar"
       />
     </>
   );

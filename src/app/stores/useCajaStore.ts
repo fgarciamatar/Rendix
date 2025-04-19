@@ -3,9 +3,11 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface Movimiento {
+  id: string;
   concepto: string;
   monto: number;
-  efectivo: boolean;
+  tipoMovimiento: "Entrada" | "Salida" 
+  tipoConcepto: "Efectivo" | "Venta" | "Movimiento"
   detalleEfectivo: boolean;
 }
 
@@ -23,60 +25,69 @@ interface CajaState {
   agregarMovimiento: (
     concepto: string,
     monto: number,
-    tipo: "Entrada" | "Salida",
-    efectivo: boolean,
+    tipoMovimiento: "Entrada" | "Salida" ,
+    tipoConcepto: "Efectivo" | "Venta" | "Movimiento",
     detalleEfectivo: boolean
   ) => void;
 
   EliminarMovimiento1: (concepto: string) => void;
-  setDetalleEfectivo: (detalle: Record<string, number>) => void;
+  setDetalleEfectivoState: (detalle: Record<string, number>) => void;
   estadoCaja: () => EstadoCaja;
-  // eliminarMovimiento: (esEntrada: boolean, index: number) => void;
+  LimpiarPlanilla: () => void;
+  
 }
 
 export const useCajaStore = create(
   persist<CajaState>(
     (set, get) => ({
+      //estados globales
       entradas: [],
       salidas: [],
       detalleEfectivoState: {},
-      agregarMovimiento: (concepto, monto, tipo, efectivo, detalleEfectivo) =>
-        set((state) => {
-          const nuevoMovimiento = {
-            concepto,
-            monto,
-            efectivo,
-            detalleEfectivo,
-          };
-          if (tipo === "Entrada") {
+
+      //funciones globales
+      agregarMovimiento: (concepto, monto, tipoMovimiento, tipoConcepto, detalleEfectivo) => {
+        const nuevoMovimiento: Movimiento = {
+          id: crypto.randomUUID(),
+          concepto,
+          monto,
+          tipoMovimiento,
+          tipoConcepto,
+          detalleEfectivo,
+        };
+     
+        return set((state) => {
+          if (tipoMovimiento === "Entrada") {
             return { entradas: [...state.entradas, nuevoMovimiento] };
           } else {
             return { salidas: [...state.salidas, nuevoMovimiento] };
           }
-        }),
+        });
+      },
+      
 
-      EliminarMovimiento1: (concepto) =>
+      EliminarMovimiento1: (id) =>
         set((state) => {
           // Buscar el movimiento en entradas y salidas
           const movimientoEntrada = state.entradas.find(
-            (m) => m.concepto === concepto
+            (m) => m.id === id
           );
           const movimientoSalida = state.salidas.find(
-            (m) => m.concepto === concepto
+            (m) => m.id === id
           );
 
           const seDebeEliminarDetalle =
-            (movimientoEntrada && movimientoEntrada.efectivo) ||
-            (movimientoSalida && movimientoSalida.efectivo);
-
+            (movimientoEntrada && movimientoEntrada.tipoConcepto === "Efectivo") ||
+            (movimientoSalida && movimientoSalida.tipoConcepto  === "Efectivo");
+            
           return {
-            entradas: state.entradas.filter((m) => m.concepto !== concepto),
-            salidas: state.salidas.filter((m) => m.concepto !== concepto),
-            detalleEfectivo: seDebeEliminarDetalle ? {} : state.detalleEfectivoState,
+            entradas: state.entradas.filter((m) => m.id !== id),
+            salidas: state.salidas.filter((m) => m.id !== id),
+            detalleEfectivoState: seDebeEliminarDetalle ? {} : state.detalleEfectivoState,
           };
         }),
 
-      setDetalleEfectivo: (detalle) =>
+        setDetalleEfectivoState: (detalle) =>
         set(() => ({
           detalleEfectivoState: detalle,
         })),
@@ -87,7 +98,7 @@ export const useCajaStore = create(
           0
         );
         const totalSalidas = get().salidas.reduce((acc, m) => acc + m.monto, 0);
-        const diferencia = Math.abs(totalEntradas - totalSalidas);
+        const diferencia =  Math.abs(totalEntradas - totalSalidas);
 
         let estado: EstadoCaja["estado"] = "balanceado";
         if (totalEntradas > totalSalidas) estado = "faltante";
@@ -100,6 +111,15 @@ export const useCajaStore = create(
           totalSalidas,
         };
       },
+      LimpiarPlanilla: () =>
+        set(() => {
+         
+          return {
+            entradas:[],
+            salidas:[],
+            detalleEfectivoState:{} 
+          };
+        }),
     }),
     {
       name: "caja-storage",

@@ -2,13 +2,14 @@
 "use client";
 
 import { useState } from "react";
-import { movimientosProps } from "./types";
 import { useCajaStore } from "../../../stores/useCajaStore";
 import ConfirmacionMovimientoModal from "./../EliminarMovimientoModal";
+import { movimientosProps } from "./types";
 
 //Icons
 import { LiaMoneyBillWaveAltSolid } from "react-icons/lia";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { TbMoneybag } from "react-icons/tb"; //venta
 // import { GiSwapBag } from "react-icons/gi";  // icono para  la venta
 
 export default function MovimientoComponent({
@@ -56,7 +57,13 @@ export default function MovimientoComponent({
           >
             <p className="pl-2 flex items-center gap-2">
               {mov.detalleEfectivo && (
-                <LiaMoneyBillWaveAltSolid  size={28} className="text-green-400" />
+                <LiaMoneyBillWaveAltSolid
+                  size={28}
+                  className="text-green-400"
+                />
+              )}
+              {mov.tipoConcepto === "Venta" && (
+                <TbMoneybag size={24} className="text-yellow-400" />
               )}
               {mov.concepto}
             </p>
@@ -66,10 +73,11 @@ export default function MovimientoComponent({
                 ? `$${mov.monto.toLocaleString("es-AR")}`
                 : "$—"}
             </p>
+            {/*DELETE */}
             <div className="flex justify-center">
               <button
                 onClick={() => {
-                  setConceptoSeleccionado(mov.concepto);
+                  setConceptoSeleccionado(mov.id);
                   setEliminarModal(true);
                 }}
                 className="text-red-500 hover:text-red-400 transition-transform transform hover:scale-125 cursor-pointer"
@@ -99,6 +107,8 @@ export default function MovimientoComponent({
           if (conceptoSeleccionado) eliminarMovimiento(conceptoSeleccionado);
           setEliminarModal(false);
         }}
+        mensaje=" ¿Estás seguro que querés eliminar este movimiento? Esta acción no se puede deshacer."
+        botonConfirmar="Eliminar"
       />
     </div>
   );

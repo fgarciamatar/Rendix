@@ -1,11 +1,20 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+
 const styles = StyleSheet.create({
-  page: { padding: 40, fontSize: 12, fontFamily: "Helvetica" },
-  title: {
-    fontSize: 22,
-    textAlign: "center",
+  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica" }, // fuente general más chica
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
     fontWeight: 700,
+  },
+  dateTurno: {
+    fontSize: 12,
+    textAlign: "right",
   },
   section: {
     flexDirection: "row",
@@ -14,17 +23,16 @@ const styles = StyleSheet.create({
   },
   box: {
     width: "48%",
-    padding: 12,
+    padding: 10,
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: "black",
     borderRadius: 5,
   },
   subtitle: {
-    fontSize: 16,
-    marginBottom: 8,
+    fontSize: 14,
+    marginBottom: 6,
     fontWeight: 700,
-    // textDecoration: "underline",
   },
   item: {
     flexDirection: "row",
@@ -39,14 +47,17 @@ const styles = StyleSheet.create({
     borderTopStyle: "solid",
     borderTopColor: "black",
   },
-  totalText: { fontSize: 14, fontWeight: 700, textAlign: "right" },
+  totalText: { fontSize: 12, fontWeight: 700, textAlign: "right" },
   efectivoBox: {
     marginTop: 30,
-    padding: 12,
+    padding: 10,
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: "black",
     borderRadius: 5,
+  },
+  efectivoText: {
+    fontSize: 9, // más chico el detalle de efectivo
   },
 });
 
@@ -54,89 +65,85 @@ interface Movimiento {
   concepto: string;
   monto: number;
 }
+type EstadoCaja = {
+  total: number;
+  estado: "balanceado" | "faltante" | "sobrante";
+  totalEntradas: number;
+  totalSalidas: number;
+};
 
-interface PDFReportProps {
+type PDFReportProps = {
   entradas: Movimiento[];
   salidas: Movimiento[];
   detalleEfectivo: Record<string, number>;
-}
-
-const agruparPorConcepto = (
-  movimientos: Movimiento[]
-): Record<string, number> => {
-  const agrupado: Record<string, number> = {};
-  movimientos.forEach(({ concepto, monto }) => {
-    agrupado[concepto] = (agrupado[concepto] || 0) + monto;
-  });
-  return agrupado;
+  fecha: string;
+  turno: string;
+  estadoCaja: EstadoCaja;
 };
 
-const PDFReport = ({ entradas, salidas, detalleEfectivo }: PDFReportProps) => {
-  const entradasAgrupadas = agruparPorConcepto(entradas);
-  const salidasAgrupadas = agruparPorConcepto(salidas);
-
-  console.log(detalleEfectivo)
-
-  const totalEntradas = Object.values(entradasAgrupadas).reduce(
-    (acc, val) => acc + val,
-    0
-  );
-  const totalSalidas = Object.values(salidasAgrupadas).reduce(
-    (acc, val) => acc + val,
-    0
-  );
-  const diferencia = Math.abs(totalEntradas - totalSalidas);
-  const estado =
-    totalEntradas > totalSalidas
-      ? "Sobrante"
-      : totalSalidas > totalEntradas
-      ? "Faltante"
-      : "Sin diferencias";
-
+const PDFReport = ({
+  entradas,
+  salidas,
+  detalleEfectivo,
+  fecha,
+  turno,
+  estadoCaja,
+}: PDFReportProps) => {
   const totalEfectivo = Object.entries(detalleEfectivo).reduce(
     (acc, [den, cant]) => acc + Number(den) * cant,
     0
   );
 
+  const formatFecha = (fecha: string) => {
+    const date = new Date(fecha);
+    const dia = String(date.getDate()).padStart(2, "0");
+    const mes = String(date.getMonth() + 1).padStart(2, "0");
+    const año = date.getFullYear();
+    return `${dia}/${mes}/${año}`;
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <Text style={styles.title}>Planilla de Caja</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>Planilla de Caja</Text>
+          <View>
+            <Text style={styles.dateTurno}>{formatFecha(fecha)}</Text>
+            <Text style={styles.dateTurno}>{turno}</Text>
+          </View>
+        </View>
 
         <View style={styles.section}>
           <View style={styles.box}>
             <Text style={styles.subtitle}>Entradas</Text>
-            {Object.entries(entradasAgrupadas).map(([concepto, monto]) => (
-              <View key={concepto} style={styles.item}>
-                <Text>{concepto}</Text>
-                <Text>${monto.toFixed(2)}</Text>
+            {entradas.map((mov, index) => (
+              <View key={`${mov.concepto}-${index}`} style={styles.item}>
+                <Text>{mov.concepto}</Text>
+                <Text>${mov.monto.toFixed(2)}</Text>
               </View>
             ))}
             <Text style={styles.totalText}>
-              Subtotal: ${totalEntradas.toFixed(2)}
+              Subtotal: ${estadoCaja.totalEntradas}
             </Text>
           </View>
 
           <View style={styles.box}>
             <Text style={styles.subtitle}>Salidas</Text>
-            {Object.entries(entradasAgrupadas).map(
-              ([concepto, monto], index) => (
-                <View key={concepto || `entrada-${index}`} style={styles.item}>
-                  <Text>{concepto || "Sin concepto"}</Text>
-                  <Text>${monto.toFixed(2)}</Text>
-                </View>
-              )
-            )}
-
+            {salidas.map((mov, index) => (
+              <View key={`${mov.concepto}-${index}`} style={styles.item}>
+                <Text>{mov.concepto}</Text>
+                <Text>${mov.monto.toFixed(2)}</Text>
+              </View>
+            ))}
             <Text style={styles.totalText}>
-              Subtotal: ${totalSalidas.toFixed(2)}
+              Subtotal: ${estadoCaja.totalSalidas}
             </Text>
           </View>
         </View>
 
         <View style={styles.totalBox}>
           <Text style={styles.totalText}>
-            Total: ${diferencia.toFixed(2)} ({estado})
+            Total: ${estadoCaja.total} ({estadoCaja.estado})
           </Text>
         </View>
 
@@ -147,10 +154,12 @@ const PDFReport = ({ entradas, salidas, detalleEfectivo }: PDFReportProps) => {
               .sort((a, b) => Number(b[0]) - Number(a[0]))
               .map(([den, cant]) => (
                 <View key={den} style={styles.item}>
-                  <Text>
+                  <Text style={styles.efectivoText}>
                     {cant} x ${Number(den).toLocaleString()}
                   </Text>
-                  <Text>${(Number(den) * cant).toLocaleString()}</Text>
+                  <Text style={styles.efectivoText}>
+                    ${(Number(den) * cant).toLocaleString()}
+                  </Text>
                 </View>
               ))}
             <Text style={styles.totalText}>
