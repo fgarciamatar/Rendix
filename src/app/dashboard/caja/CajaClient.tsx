@@ -14,6 +14,7 @@ import { LuSave } from "react-icons/lu";
 import ConfirmacionMovimientoModal from "../../components/Caja/ConfirmacionMovimientoModal/ConfirmacionMovimientoModal";
 import EfectivoModal from "../../components/Caja/EfectivoModal";
 import NuevoMovimientoModal from "../../components/Caja/NuevoMovimientoModal";
+import RegistarVentaModal from "../../components/Caja/RegistrarVentaModal";
 import LimpiarModal from "./../../components/Caja/EliminarMovimientoModal";
 
 const PDFButtonClient = dynamic(
@@ -32,6 +33,9 @@ export default function CajaClient() {
   const LimpiarPlanilla = useCajaStore((state) => state.LimpiarPlanilla);
   const estadoCajaStateGlobal = useCajaStore((state) => state.estadoCaja);
   const estadoDeCaja = estadoCajaStateGlobal();
+  const ventaMañana = useCajaStore((state) => state.ventaMañanaSistema);
+  const ventaMañanaCaja = useCajaStore((state) => state.ventaMañanaCaja);
+  const ventaTardeCaja = useCajaStore((state) => state.ventaTardeCaja);
 
   //ESTADO LOCAL
   const [fechaActual, setFechaActual] = useState("");
@@ -42,6 +46,12 @@ export default function CajaClient() {
   const [modalLimpiarConfirmacion, setModalLimpiarConfirmacion] =
     useState(false);
   const [mostrarBotonPDF, setMostrarBotonPDF] = useState(false);
+  const [modalVentaManana, setModalVentaManana] = useState(false);
+
+  const registrarVentaManana = useCajaStore(
+    (state) => state.RegistrarVentaMañana
+  );
+  const registrarVentaCaja = useCajaStore((state) => state.SetVentaCaja);
 
   //FUNCTIONS
   const handleGuardarMovimiento = (data: {
@@ -64,6 +74,21 @@ export default function CajaClient() {
 
   const handleGuardar = () => {
     setMostrarBotonPDF(true); // Ahora se muestra el botón de PDF
+    if (turno === "Mañana") {
+      const TentradaMañana = entradas
+        .filter((e) => e.tipoConcepto !== "Venta")
+        .reduce((acc, e) => acc + e.monto, 0);
+
+      const totalMañana = estadoCajaStateGlobal().totalSalidas - TentradaMañana;
+      registrarVentaCaja(turno, totalMañana);
+    } else if (turno === "Tarde") {
+      const TentradaTarde = entradas
+        .filter((e) => e.tipoConcepto !== "Venta")
+        .reduce((acc, e) => acc + e.monto, 0);
+
+      const totalTarde = estadoCajaStateGlobal().totalSalidas - TentradaTarde;
+      registrarVentaCaja(turno, totalTarde);
+    }
   };
   const handleLimpiarPlanilla = () => {
     setModalLimpiarConfirmacion(true);
@@ -80,9 +105,9 @@ export default function CajaClient() {
 
     // Calcular turno
     const tiempo = hora + minutos / 60;
-    if (tiempo >= 7 && tiempo < 16.5) {
+    if (tiempo >= 7 && tiempo < 14) {
       setTurno("Mañana");
-    } else if (tiempo >= 16.5 && tiempo < 22) {
+    } else if (tiempo >= 14 && tiempo < 22.5) {
       setTurno("Tarde");
     } else {
       setTurno("Noche");
@@ -167,6 +192,9 @@ export default function CajaClient() {
             entradas={entradas}
             salidas={salidas}
             detalleEfectivo={detalleEfectivoState}
+            ventaMañana={ventaMañana}
+            ventaMañanaCaja={ventaMañanaCaja}
+            ventaTardeCaja={ventaTardeCaja}
             estadoCaja={estadoDeCaja}
             onDownloaded={() => setMostrarBotonPDF(false)}
           />
@@ -178,6 +206,16 @@ export default function CajaClient() {
           <AiTwotoneDelete size={22} />
           Limpiar Planilla
         </button>
+
+        {turno === "Tarde" && (
+          <button
+            onClick={() => setModalVentaManana(true)}
+            className="bg-purple-700 hover:bg-purple-800 text-white px-5 py-3 rounded-lg shadow flex gap-2 items-center"
+          >
+            <BsCurrencyDollar size={22} />
+            Registrar venta mañana
+          </button>
+        )}
       </div>
 
       <NuevoMovimientoModal
@@ -205,6 +243,13 @@ export default function CajaClient() {
         }}
         mensaje="¿Estás seguro que querés limpiar la Planilla? Esta acción no se puede deshacer."
         botonConfirmar="Limpiar"
+      />
+      <RegistarVentaModal
+        isOpen={modalVentaManana}
+        onClose={() => setModalVentaManana(false)}
+        onSave={(venta: number) => {
+          registrarVentaManana(venta);
+        }}
       />
     </>
   );

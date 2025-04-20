@@ -79,6 +79,13 @@ type PDFReportProps = {
   fecha: string;
   turno: string;
   estadoCaja: EstadoCaja;
+  ventaMañana: number;
+  ventaTarde: number;
+  ventaTotal: number;
+  ventaMañanaCaja: number;
+  ventaTardeCaja: number;
+  ventaTotalCaja: number;
+  
 };
 
 const PDFReport = ({
@@ -88,6 +95,12 @@ const PDFReport = ({
   fecha,
   turno,
   estadoCaja,
+  ventaMañana,
+  ventaTarde,
+  ventaTotal,
+  ventaMañanaCaja,
+  ventaTardeCaja,
+  ventaTotalCaja
 }: PDFReportProps) => {
   const totalEfectivo = Object.entries(detalleEfectivo).reduce(
     (acc, [den, cant]) => acc + Number(den) * cant,
@@ -146,7 +159,8 @@ const PDFReport = ({
             Total: ${estadoCaja.total} ({estadoCaja.estado})
           </Text>
         </View>
-
+      </Page>
+      <Page size="A4" style={styles.page}>
         {Object.keys(detalleEfectivo).length > 0 && (
           <View style={styles.efectivoBox}>
             <Text style={styles.subtitle}>Detalle de Efectivo</Text>
@@ -167,6 +181,33 @@ const PDFReport = ({
             </Text>
           </View>
         )}
+        <View style={styles.totalBox}>
+          <Text style={styles.totalText}>Sistema Mañana = ${ventaMañana}</Text>
+          {turno !== "mañana" && (
+            <>
+              <Text style={styles.totalText}>
+                Sistema Tarde = ${ventaTarde}
+              </Text>
+              <Text style={styles.totalText}>
+                Sistema Total = ${ventaTotal}
+              </Text>
+            </>
+          )}
+        </View>
+
+        <View style={styles.totalBox}>
+          <Text style={styles.totalText}>Caja Mañana = ${ventaMañanaCaja}</Text>
+          {turno !== "mañana" && (
+            <>
+              <Text style={styles.totalText}>
+                Caja Tarde = ${ventaTardeCaja}
+              </Text>
+              <Text style={styles.totalText}>
+                Caja Total = ${ventaTotalCaja}
+              </Text>
+            </>
+          )}
+        </View>
       </Page>
     </Document>
   );

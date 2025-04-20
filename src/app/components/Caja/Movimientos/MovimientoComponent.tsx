@@ -49,7 +49,11 @@ export default function MovimientoComponent({
       </div>
 
       {/* Movimientos */}
-      <div className="space-y-3 cursor-pointer">
+      <div
+        className={`space-y-3 cursor-pointer ${
+          movimientos.length > 8 ? "max-h-[480px] overflow-y-auto pr-1" : ""
+        }`}
+      >
         {movimientos.map((mov, index) => (
           <div
             key={index}
@@ -73,7 +77,7 @@ export default function MovimientoComponent({
                 ? `$${mov.monto.toLocaleString("es-AR")}`
                 : "$—"}
             </p>
-            {/*DELETE */}
+
             <div className="flex justify-center">
               <button
                 onClick={() => {

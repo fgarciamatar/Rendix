@@ -12,22 +12,26 @@ export type EstadoCaja = {
 export default function TotalCajaComponent() {
   // 1. Llamar SIEMPRE los hooks al inicio
 
-  const getEstadoCaja = useCajaStore((state) => state.estadoCaja);
+  const entradas = useCajaStore((state) => state.entradas);
+  const salidas = useCajaStore((state) => state.salidas);
+  
+  const estadoCaja = useCajaStore.getState().estadoCaja(); // se recalcula, no se memoriza
+  
 
-  // 2. Manejar el estado de “montado” para evitar hydration mismatch
+
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+  }, [estadoCaja.total]);
 
   // 3. Si querés ocultar la UI hasta que monte, hacelo DESPUÉS de llamar los hooks
   if (!mounted) {
     return null; 
   }
 
-  // 4. Ahora que el componente está montado, obtenemos el estado de la caja
-  const estadoCaja: EstadoCaja = getEstadoCaja();
 
   // 5. Definimos la lógica del color
   const color =
@@ -42,7 +46,7 @@ export default function TotalCajaComponent() {
       <h2 className="text-3xl md:text-4xl font-extrabold text-blue-400">
         Diferencia:{" "}
         <span className={`block md:inline ${color}`}>
-          ${estadoCaja.total.toFixed(2)}
+        ${estadoCaja.total.toLocaleString("es-AR")}
         </span>
       </h2>
       <p className="text-lg mt-2 text-gray-400">

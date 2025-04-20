@@ -1,5 +1,4 @@
 "use client";
-
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { FiDownload } from "react-icons/fi";
 import PDFReport from "../PDFReport";
@@ -27,6 +26,9 @@ type PDFProps = {
   salidas: Movimiento[];
   detalleEfectivo: Record<string, number>;
   estadoCaja: EstadoCaja;
+  ventaMañana: number;
+  ventaMañanaCaja: number;
+  ventaTardeCaja: number;
   onDownloaded?: () => void; // ✨ NUEVO CALLBACK
 };
 
@@ -37,9 +39,22 @@ export default function PDFButtonClient({
   salidas,
   detalleEfectivo,
   estadoCaja,
+  ventaMañana,
+  ventaMañanaCaja,
+  ventaTardeCaja,
   onDownloaded,
 }: PDFProps) {
   const [clicked, setClicked] = useState(false);
+  const ventaTarde =
+  entradas
+    .filter((mov) => mov.tipoConcepto === "Venta")
+    .reduce((acc, mov) => acc + mov.monto, 0) +
+  salidas
+    .filter((mov) => mov.tipoConcepto === "Venta")
+    .reduce((acc, mov) => acc + mov.monto, 0);
+
+    const  ventaTotal = ventaMañana + ventaTarde;
+    const ventaTotalCaja = ventaMañanaCaja + ventaTardeCaja;
 
   const handleClick = () => {
     if (!clicked) {
@@ -61,6 +76,12 @@ export default function PDFButtonClient({
           fecha={fecha}
           turno={turno}
           estadoCaja={estadoCaja}
+          ventaMañana={ventaMañana}
+          ventaTarde={ventaTarde}
+          ventaTotal={ventaTotal}
+          ventaMañanaCaja={ventaMañanaCaja}
+          ventaTardeCaja={ventaTardeCaja}
+          ventaTotalCaja={ventaTotalCaja}
         />
       }
       fileName={`Caja[${fecha}]-[${turno}].pdf`}
