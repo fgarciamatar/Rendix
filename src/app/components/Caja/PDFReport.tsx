@@ -85,7 +85,6 @@ type PDFReportProps = {
   ventaMañanaCaja: number;
   ventaTardeCaja: number;
   ventaTotalCaja: number;
-  
 };
 
 const PDFReport = ({
@@ -100,7 +99,7 @@ const PDFReport = ({
   ventaTotal,
   ventaMañanaCaja,
   ventaTardeCaja,
-  ventaTotalCaja
+  ventaTotalCaja,
 }: PDFReportProps) => {
   const totalEfectivo = Object.entries(detalleEfectivo).reduce(
     (acc, [den, cant]) => acc + Number(den) * cant,
@@ -181,10 +180,13 @@ const PDFReport = ({
             </Text>
           </View>
         )}
+
         <View style={styles.totalBox}>
-          <Text style={styles.totalText}>Sistema Mañana = ${ventaMañana}</Text>
           {turno !== "mañana" && (
             <>
+              <Text style={styles.totalText}>
+                Sistema Mañana = ${ventaMañana}
+              </Text>
               <Text style={styles.totalText}>
                 Sistema Tarde = ${ventaTarde}
               </Text>
@@ -196,9 +198,11 @@ const PDFReport = ({
         </View>
 
         <View style={styles.totalBox}>
-          <Text style={styles.totalText}>Caja Mañana = ${ventaMañanaCaja}</Text>
-          {turno !== "mañana" && (
+          {turno !== "tarde" && (
             <>
+              <Text style={styles.totalText}>
+                Caja Mañana = ${ventaMañanaCaja}
+              </Text>
               <Text style={styles.totalText}>
                 Caja Tarde = ${ventaTardeCaja}
               </Text>
@@ -207,6 +211,9 @@ const PDFReport = ({
               </Text>
             </>
           )}
+        </View>
+        <View style={styles.totalBox}>
+          <Text style={styles.totalText} > Diferencia = {ventaTotal - ventaTotalCaja}</Text>
         </View>
       </Page>
     </Document>
