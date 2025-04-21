@@ -23,7 +23,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="h-screen w-64 bg-[#0e0f11] text-white p-4 border-r border-gray-800 overflow-hidden">
+    <aside className="h-screen w-64 bg-[#1d3163] text-white p-4 border-r border-gray-800 overflow-hidden">
       <h2 className="text-xl font-bold mb-6 pl-2 tracking-wide">Navegación</h2>
       <nav className="flex flex-col gap-2">
         {navItems.map((item) => {
@@ -35,8 +35,8 @@ export default function Sidebar() {
             className={clsx(
               "flex items-center gap-4 px-5 py-3 rounded-lg text-lg font-semibold transition-all duration-200 cursor-pointer",
               isActive
-                ? "bg-[#1c1f24] text-white"
-                : "text-gray-400 hover:bg-[#262b33] hover:text-white"
+                ? "bg-[#11214c] text-white"
+                : "text-gray-400 hover:bg-[#455f82fa] hover:text-white"
             )}
           >
             <item.icon size={22} />

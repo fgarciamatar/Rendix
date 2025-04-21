@@ -1,11 +1,7 @@
-import {
-  ArrowRight,
-  BarChart3,
-  FileText,
-  Upload,
-  SlidersHorizontal
-} from "lucide-react";
+import { ArrowRight, BarChart3, SlidersHorizontal, Upload } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import icon from "./favicon.ico";
 
 export default function Home() {
   return (
@@ -14,9 +10,10 @@ export default function Home() {
       <header className="sticky top-0 z-50 w-full border-b border-[#1a2035] bg-[#0a0f1c]/95 backdrop-blur supports-[backdrop-filter]:bg-[#0a0f1c]/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2 text-xl font-bold">
-            <FileText className="h-6 w-6" />
-            <span>Renderix</span>
+            <Image src={icon} alt="Logo" width={50} height={50} />
+            <span>Rendix</span>
           </div>
+
           <div className="flex items-center gap-4">
             <Link
               href="/login"
@@ -150,7 +147,6 @@ export default function Home() {
                     "Visualiza y gestiona todas las transferencias con filtros personalizados.",
                 },
                 {
-                    
                   icon: <SlidersHorizontal className="h-10 w-10" />,
                   title: "Control de cajas",
                   description:
@@ -178,7 +174,7 @@ export default function Home() {
       <footer className="w-full border-t py-6">
         <div className="container flex flex-col items-center justify-center gap-4 md:flex-row md:justify-between">
           <p className="text-center text-sm text-muted-foreground md:text-left">
-            &copy; {new Date().getFullYear()} TransferSystem. Todos los derechos
+            &copy; {new Date().getFullYear()} Rendix. Todos los derechos
             reservados.
           </p>
           <div className="flex gap-4">
