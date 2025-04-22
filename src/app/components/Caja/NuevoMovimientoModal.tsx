@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback  } from "react";
 import { TbMoneybag } from "react-icons/tb";
 import { useCajaStore } from "@/app/stores/useCajaStore";
 import ConfirmacionMovimientoModal from "./ConfirmacionMovimientoModal/ConfirmacionMovimientoModal";
@@ -41,14 +41,17 @@ const hayVenta = [...entradas, ...salidas].some(
   
 
   // Resetear campos al cerrar modal
-  const handleClose = () => {
+
+
+  const handleClose = useCallback(() => {
     setTipoMovimiento("Salida");
     setConcepto("");
     setMonto("");
     setDetalleEfectivo(false);
-    setTipoConcepto("Movimiento")
+    setTipoConcepto("Movimiento");
     onClose();
-  };
+  }, [onClose]);
+
 
   const handleSave = () => {
     if (!concepto || !monto) return;

@@ -34,7 +34,7 @@ export default function Home() {
               {/* Texto principal */}
               <div className="space-y-4">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Sistema de Gestión de Transferencias
+                  Sistema de Gestión de Transferencias y de Cajas.
                 </h1>
                 <p className="max-w-[600px] text-gray-400 md:text-xl">
                   Plataforma integral para el registro, validación y seguimiento

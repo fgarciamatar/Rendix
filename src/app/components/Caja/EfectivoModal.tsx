@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 
 import { useCajaStore } from "@/app/stores/useCajaStore";
 import { LiaMoneyBillWaveAltSolid } from "react-icons/lia";
@@ -53,14 +53,17 @@ const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
     0
   );
 
-  const handleClose = () => {
+  const handleClose =  useCallback(() => {
     onClose();
     setConcepto("");
     setCantidades({});
     setTipoMovimiento("Salida");
     setTipoConcepto("Efectivo");
     setDetalleEfectivo(false);
-  };
+  }, [onClose]);
+
+  
+  
 
   const handleSave = () => {
     if (!concepto || totalGeneral === 0) return;
