@@ -23,6 +23,8 @@ export default function TotalCajaComponent() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    console.log(entradas, salidas);
+    
     setMounted(true);
     
   }, [estadoCaja.total]);

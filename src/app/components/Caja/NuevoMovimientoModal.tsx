@@ -100,7 +100,7 @@ const hayVenta = [...entradas, ...salidas].some(
     return () => {
       window.removeEventListener("keydown", handleEsc);
     };
-  }, [isOpen]);
+  }, [handleClose, isOpen]);
 
   if (!isOpen) return null;
 

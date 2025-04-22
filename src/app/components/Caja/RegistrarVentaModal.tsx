@@ -48,7 +48,7 @@ const RegistarVentaModal: React.FC<Props> = ({ isOpen, onClose }) => {
     return () => {
       window.removeEventListener("keydown", handleEsc);
     };
-  }, [isOpen]);
+  }, [handleClose, isOpen]);
 
   if (!isOpen) return null;
 

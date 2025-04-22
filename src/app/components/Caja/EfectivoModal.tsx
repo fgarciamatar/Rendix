@@ -103,7 +103,7 @@ const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
       conceptoRef.current?.focus();
     }
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [isOpen]);
+  }, [handleClose, isOpen]);
 
   return (
     <AnimatePresence>
