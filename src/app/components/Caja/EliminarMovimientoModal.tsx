@@ -19,9 +19,9 @@ const EliminarMovimientoModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
-      <div className="bg-gray-900 text-white p-6 rounded-lg w-full max-w-sm shadow-xl">
+      <div className=" bg-gradient-to-b from-[#1e469d] to-[#122b70] text-white p-6 rounded-lg w-full max-w-sm shadow-xl">
         <h2 className="text-xl font-bold mb-4">Eliminar Movimiento</h2>
-        <p className="text-sm text-gray-400 mb-6">{mensaje}</p>
+        <p className="text-sm text-white mb-6">{mensaje}</p>
 
         <div className="flex justify-end space-x-3">
           <button

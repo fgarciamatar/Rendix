@@ -1,0 +1,160 @@
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import {
+  ArrowLeft,
+  FileText,
+  Mail,
+  MapPin,
+  Phone,
+  ChevronDown,
+  BarChart3,
+  Clock,
+  Shield,
+  Database,
+  LineChart,
+  CheckCircle2,
+} from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+// import { ContactForm } from "@/components/contact-form"
+
+export default function ContactPage() {
+  const [showForm, setShowForm] = useState(false)
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-slate-900 shadow-sm">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2 font-bold text-2xl">
+            <FileText className="h-7 w-7 text-primary" />
+            <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Rendix</span>
+          </div>
+          <Link href="/">
+            <div className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md border">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver al inicio
+            </div>
+          </Link>
+        </div>
+      </header>
+
+      <main className="flex-1 container py-12">
+        <h1 className="text-3xl font-bold mb-8 text-center">Contacto</h1>
+
+        <div className="mb-8 border rounded-lg shadow-sm p-6 bg-white dark:bg-slate-800">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl md:text-3xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent inline-block">
+              ¿Por qué contratar nuestro sistema?
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Descubre cómo Rendix puede transformar la gestión financiera de tu empresa
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: <BarChart3 className="h-6 w-6 text-primary" />, title: "Optimización Operativa",
+                description: "Automatiza el registro y control de transferencias, mejorando significativamente la eficiencia operativa y reduciendo errores."
+              },
+              {
+                icon: <Clock className="h-6 w-6 text-primary" />, title: "Información en Tiempo Real",
+                description: "Accede de manera rápida y directa a información financiera actualizada, facilitando la toma de decisiones."
+              },
+              {
+                icon: <Shield className="h-6 w-6 text-primary" />, title: "Seguridad y Trazabilidad",
+                description: "Seguimiento detallado y transparente de cada transacción, reduciendo riesgos de fraude o mal manejo de información."
+              },
+              {
+                icon: <Database className="h-6 w-6 text-primary" />, title: "Integridad de Datos",
+                description: "Elimina la desorganización y duplicidad de datos, garantizando registros precisos y fiables."
+              },
+              {
+                icon: <LineChart className="h-6 w-6 text-primary" />, title: "Escalabilidad",
+                description: "Ideal para manejar grandes volúmenes de datos sin perder eficiencia, optimizando recursos operativos."
+              },
+              {
+                icon: <CheckCircle2 className="h-6 w-6 text-primary" />, title: "Resultados Garantizados",
+                description: "Incrementa la eficiencia, precisión y transparencia en la gestión financiera de tu empresa."
+              },
+            ].map((item, i) => (
+              <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full mr-3">{item.icon}</div>
+                  <h3 className="font-semibold text-lg">{item.title}</h3>
+                </div>
+                <p className="text-muted-foreground">{item.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <p className="text-lg mb-6 max-w-3xl mx-auto">
+              Nuestro sistema está diseñado para optimizar y automatizar el registro y control de las transferencias,
+              mejorando significativamente la eficiencia operativa y garantizando una gestión financiera transparente y precisa.
+            </p>
+            <button onClick={() => setShowForm(!showForm)} className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-700 transition-all group">
+              Quiero más información
+              <ChevronDown className={`ml-2 h-4 w-4 transition-transform duration-200 ${showForm ? "rotate-180" : ""}`} />
+            </button>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showForm && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="grid gap-8 md:grid-cols-2">
+                <div className="border rounded-lg shadow-sm p-6 bg-white dark:bg-slate-800">
+                  <h3 className="text-xl font-semibold mb-2">Información de Contacto</h3>
+                  <p className="mb-4 text-gray-600 dark:text-gray-400">Estamos aquí para ayudarte</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center">
+                      <MapPin className="mr-2 h-4 w-4 text-primary" />
+                      <span>Av. Corrientes 1234, CABA, Argentina</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Phone className="mr-2 h-4 w-4 text-primary" />
+                      <span>+54 11 1234-5678</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Mail className="mr-2 h-4 w-4 text-primary" />
+                      <span>info@rendix.com</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* <ContactForm /> */}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      <footer className="w-full border-t py-6">
+        <div className="container flex flex-col items-center justify-center gap-4 md:flex-row md:justify-between">
+          <p className="text-center text-sm text-muted-foreground md:text-left">
+            &copy; {new Date().getFullYear()} Rendix. Todos los derechos reservados.
+          </p>
+          <div className="flex gap-4">
+            <Link href="/terms" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
+              Términos
+            </Link>
+            <Link href="/privacy" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
+              Privacidad
+            </Link>
+            <Link href="/contact" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
+              Contacto
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}

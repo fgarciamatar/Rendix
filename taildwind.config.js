@@ -1,7 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   theme: {
-    extend: {},
+    animation: {
+      "spin-reverse": "spin 1s linear reverse infinite",
+    },
+    extend: {
+      colors: {
+        fondo: "#18294F",
+      },
+    },
     colors: {
       white: "rgb(255,255,255)",
       black: "rgb(0,0,0)",

@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-[#0a0f1c] text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#1a2035] bg-[#0a0f1c]/95 backdrop-blur supports-[backdrop-filter]:bg-[#0a0f1c]/60">
+      <header className="sticky top-0 z-50 w-full border-b border-[#243B85] bg-[#243B85]/95 backdrop-blur supports-[backdrop-filter]:bg-[#2A4080]/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2 text-xl font-bold">
             <Image src={icon} alt="Logo" width={50} height={50} />
@@ -28,18 +28,17 @@ export default function Home() {
       {/* Main */}
       <main className="flex-1">
         {/* Sección principal */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-[#0a0f1c] to-[#0f172a]">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-[#1f3f8f] to-[#0f172a]">
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-12">
               {/* Texto principal */}
               <div className="space-y-4">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Sistema de Gestión de Transferencias y de Cajas.
+                  Sistema de Gestión de Transferencias y de Planillas de Cajas.
                 </h1>
                 <p className="max-w-[600px] text-gray-400 md:text-xl">
-                  Plataforma integral para el registro, validación y seguimiento
-                  de transferencias bancarias de preventistas y supervisores,
-                  así como para el control y gestión de cajas.
+                  Plataforma integral para el registro, seguimiento y control de
+                  transferencias, y para la gestión eficiente de cajas.
                 </p>
                 <div className="flex flex-col gap-4 sm:flex-row">
                   <Link
@@ -126,7 +125,8 @@ export default function Home() {
                 </h2>
                 <p className="max-w-[900px] text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Nuestra plataforma ofrece todas las herramientas necesarias
-                  para gestionar eficientemente las transferencias bancarias.
+                  para registrar y controlar eficientemente las transferencias
+                  bancarias.
                 </p>
               </div>
             </div>
@@ -137,20 +137,20 @@ export default function Home() {
                   icon: <Upload className="h-10 w-10" />,
                   title: "Registro de Transferencias",
                   description:
-                    "Sube comprobantes y registra datos de transferencias de forma rápida y sencilla.",
+                    "El sistema permite un seguimiento preciso de las transferencias realizadas por preventistas o consumidores finales, incluyendo el registro de los comprobantes correspondientes.",
                 },
 
                 {
                   icon: <BarChart3 className="h-10 w-10" />,
                   title: "Panel de Control",
                   description:
-                    "Visualiza y gestiona todas las transferencias con filtros personalizados.",
+                    "Mejora el proceso de seguimiento de las transferencias y las planillas de caja, asegurando un control más eficiente y claro de los movimientos financieros.",
                 },
                 {
                   icon: <SlidersHorizontal className="h-10 w-10" />,
-                  title: "Control de cajas",
+                  title: "PLanillas de cajas",
                   description:
-                    "Controla y gestiona las cajas, permitiendo la carga y seguimiento de las transferencias registradas por los preventistas.",
+                    "Facilita la automatización de las planillas de caja, eliminando la necesidad de realizar registros manuales, lo que optimiza el proceso y reduce posibles errores.",
                 },
               ].map((feature, index) => (
                 <button
@@ -171,22 +171,16 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="w-full border-t py-6">
-        <div className="container flex flex-col items-center justify-center gap-4 md:flex-row md:justify-between">
-          <p className="text-center text-sm text-muted-foreground md:text-left">
+      <footer className="w-full border-t py-6  border-[#243B85] bg-[#243B85]/95 backdrop-blur supports-[backdrop-filter]:bg-[#2A4080]/60">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
+          <p className="text-center md:text-left text-base text-gray-400 tracking-wide mb-4 md:mb-0">
             &copy; {new Date().getFullYear()} Rendix. Todos los derechos
             reservados.
           </p>
-          <div className="flex gap-4">
-            <Link
-              href="/login"
-              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-            >
-              Términos
-            </Link>
+          <div className="w-full md:w-auto flex justify-center md:justify-end">
             <Link
               href="/contact"
-              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+              className="text-base text-gray-400 hover:text-white transition"
             >
               Contacto
             </Link>
