@@ -74,6 +74,8 @@ export const useLoginStore = create<LoginState>()(
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+        console.log("Respuesta del servidor:", res);
+        
         
         if (!res.ok) {
           const err = await res.json();
