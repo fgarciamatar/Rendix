@@ -71,7 +71,6 @@ export const useLoginStore = create<LoginState>()(
 
         const res = await fetch(`${API}/login`, {
           method: "POST",
-          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
@@ -119,7 +118,8 @@ export const useLoginStore = create<LoginState>()(
                 company: "",
               },
             });
-            sessionStorage.removeItem("UserAccess");
+            localStorage.removeItem("token");
+            // sessionStorage.removeItem("UserAccess");
             return res;
           } else {
             console.error("Error al cerrar sesión");
