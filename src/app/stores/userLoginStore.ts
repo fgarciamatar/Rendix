@@ -75,13 +75,16 @@ export const useLoginStore = create<LoginState>()(
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-
+        
         if (!res.ok) {
           const err = await res.json();
           throw new Error(err.message || "Login inválido");
         }
-
+        
         const data = await res.json();
+        localStorage.setItem("token", data.token);
+        console.log("Token guardado en localStorage:", data.token);
+        
 
         set({ role: data.user.role });
         set({ userData: data.user });
