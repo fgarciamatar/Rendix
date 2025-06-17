@@ -71,21 +71,17 @@ export const useLoginStore = create<LoginState>()(
 
         const res = await fetch(`${API}/login`, {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        console.log("Respuesta del servidor:", res);
-        
-        
+
         if (!res.ok) {
           const err = await res.json();
           throw new Error(err.message || "Login inválido");
         }
-        
+
         const data = await res.json();
-        localStorage.setItem("token", data.token);
-        console.log("Token guardado en localStorage:", data.token);
-        
 
         set({ role: data.user.role });
         set({ userData: data.user });
@@ -120,8 +116,7 @@ export const useLoginStore = create<LoginState>()(
                 company: "",
               },
             });
-            localStorage.removeItem("token");
-            // sessionStorage.removeItem("UserAccess");
+            sessionStorage.removeItem("UserAccess");
             return res;
           } else {
             console.error("Error al cerrar sesión");
