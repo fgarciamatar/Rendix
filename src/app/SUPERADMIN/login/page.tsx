@@ -23,7 +23,7 @@ export default function SuperAdminLogin() {
     } else {
       setError(res.error);
       setMessage("");
-      alert("hola");
+      alert(res.error);
     }
   };
 
