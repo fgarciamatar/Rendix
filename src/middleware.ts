@@ -28,33 +28,28 @@ const roleAccess: Record<string, string[]> = {
   ],
 };
 export async function middleware(request: NextRequest) {
-  console.log("Middleware triggered");
+  const token = request.cookies.get("token")?.value;
+
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 
   try {
-    const token = request.cookies.get("token");
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
     const res = await fetch(`${API}/verify-token`, {
       method: "GET",
-      credentials: "include",
+      headers: {
+        Cookie: `token=${token}`, // 👈 PASÁS LA COOKIE MANUALMENTE
+      },
     });
 
     if (!res.ok) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
+
     const data = await res.json();
     const role = data.user?.role;
-
-    if (!role) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
     const pathname = new URL(request.url).pathname;
-
     const allowedRoutes = roleAccess[role];
-
     const isAllowed =
       allowedRoutes.includes("*") || allowedRoutes.includes(pathname);
 
