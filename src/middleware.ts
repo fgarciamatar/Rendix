@@ -27,10 +27,14 @@ const roleAccess: Record<string, string[]> = {
     "/dashboard/soporte",
   ],
 };
+
 export async function middleware(request: NextRequest) {
+  console.log("🔐 Middleware ejecutado");
+
   const token = request.cookies.get("token")?.value;
 
   if (!token) {
+    console.log("🚫 Sin token, redirigiendo a login");
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -38,32 +42,42 @@ export async function middleware(request: NextRequest) {
     const res = await fetch(`${API}/verify-token`, {
       method: "GET",
       headers: {
-        Cookie: `token=${token}`, // 👈 PASÁS LA COOKIE MANUALMENTE
+        Cookie: `token=${token}`, // 👈 reenviás la cookie manualmente al backend
       },
     });
 
     if (!res.ok) {
+      console.log("❌ Token inválido o expirado");
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
     const data = await res.json();
     const role = data.user?.role;
     const pathname = new URL(request.url).pathname;
+
+    if (!role || !roleAccess[role]) {
+      console.log("⚠️ Rol no definido o inválido");
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
     const allowedRoutes = roleAccess[role];
+
     const isAllowed =
       allowedRoutes.includes("*") || allowedRoutes.includes(pathname);
 
     if (!isAllowed) {
+      console.log("⛔ Ruta no permitida para este rol");
       return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
 
     return NextResponse.next();
   } catch (error) {
-    console.error("Middleware error:", error);
+    console.error("❗ Error en middleware:", error);
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }
 
+// Aplicar middleware a rutas protegidas
 export const config = {
-  matcher: ["/dashboard", "/dashboard/:path*"], // rutas que querés proteger
+  matcher: ["/dashboard", "/dashboard/:path*"],
 };
