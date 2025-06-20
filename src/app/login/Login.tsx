@@ -2,7 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa6";
 import Loader from "../components/Loader"; // Ajusta la ruta si es necesario
 import { useLoginStore } from "../stores/userLoginStore";
@@ -51,13 +51,6 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 };
 
 
-  useEffect(() => {
-    const doLogout = async () => {
-      await useLoginStore.getState().logout();
-    };
-
-    doLogout();
-  }, []);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-800 text-white p-4">
