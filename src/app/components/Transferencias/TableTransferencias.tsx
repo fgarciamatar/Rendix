@@ -1,5 +1,4 @@
 "use client";
-import { useCajaStore } from "@/app/stores/useCajaStore";
 import React, { useState } from "react";
 import { CiCircleCheck, CiReceipt } from "react-icons/ci";
 import { FiSearch } from "react-icons/fi";
@@ -25,7 +24,7 @@ interface Transferencia {
 
 interface Props {
   transferencias: Transferencia[];
-  onReviewClick: (id: number) => void;
+  onReviewClick: (t: Transferencia) => void;
   onChangeEstado: (id: number, estado: string) => void;
 }
 
@@ -34,7 +33,6 @@ const TransferenciaTable: React.FC<Props> = ({
   onReviewClick,
   onChangeEstado,
 }) => {
-  const agregarMovimiento = useCajaStore((state) => state.agregarMovimiento);
   const [currentPage, setCurrentPage] = useState(1);
   const [transferenciaActual, setTransferenciaActual] =
     useState<Transferencia | null>(null);
@@ -65,15 +63,7 @@ const TransferenciaTable: React.FC<Props> = ({
         (role === "admin" || role === "cashier") && (
           <button
             onClick={() => {
-              console.log(t.amount);
-              onReviewClick(t.id);
-              agregarMovimiento(
-                `Transferencia ${t.salesman} ${t.clientName}`,
-                Number(t.amount), // 👈 conversión explícita
-                "Salida",
-                "Movimiento",
-                false
-              );
+              onReviewClick(t); // ahora pasa el objeto completo
             }}
             className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-2 bg-yellow-500 hover:bg-yellow-600 text-gray-900 text-xs sm:text-base font-semibold rounded-md"
           >

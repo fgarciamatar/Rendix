@@ -1,10 +1,26 @@
 "use client";
+import { useCajaStore } from "@/app/stores/useCajaStore";
 import { useTransferenciasStore } from "@/app/stores/useTransferenciasStore";
 import React, { useEffect, useState } from "react";
 import { Filtro, mapFiltroToEstado } from "../../utils/useHelpers";
 import ModalConfirmacion from "../ModalConfirm/ModalConfirm";
 import TransferenciaFilters from "./FiltersTransferencias";
 import TransferenciaTable from "./TableTransferencias";
+
+interface Transferencia {
+  id: number;
+  amount: number;
+  numberOperation: number;
+  dateTransfer: string;
+  dateOfLoading: string;
+  clientName: string;
+  clientNumber: number;
+  salesman: string;
+  destinationBank: string;
+  originBank: string;
+  status: string;
+  receiptImage: string;
+}
 
 export const TransferenciasCard: React.FC = () => {
   const [filtro, setFiltro] = useState<Filtro>("Todas");
@@ -13,9 +29,8 @@ export const TransferenciasCard: React.FC = () => {
   const [salesmanFiltro, setSalesmanFiltro] = useState<string | null>(null);
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [transferenciaSeleccionada, setTransferenciaSeleccionada] = useState<
-    number | null
-  >(null);
+  const [transferenciaSeleccionada, setTransferenciaSeleccionada] =
+    useState<Transferencia | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
 
   const allTransfer = useTransferenciasStore((state) => state.allTransfer);
@@ -31,6 +46,8 @@ export const TransferenciasCard: React.FC = () => {
   const changeStateTransfer = useTransferenciasStore(
     (state) => state.changeStateTransfer
   );
+  const agregarMovimiento = useCajaStore((state) => state.agregarMovimiento);
+
   useEffect(() => {
     if (currentPage === 0) getAllTransfer();
     setCurrentPage(1);
@@ -40,7 +57,6 @@ export const TransferenciasCard: React.FC = () => {
     if (transferLoading !== 0) getAllTransfer();
     setTransferLoading();
   }, [transferLoading]);
-
 
   const cambiardeEstadoTransferencia = async (id: number, estado: string) => {
     setCurrentPage(0);
@@ -63,13 +79,11 @@ export const TransferenciasCard: React.FC = () => {
           !fechaFiltro || t.dateTransfer?.startsWith(fechaFiltro);
         const matchSalesman = !salesmanFiltro || t.salesman === salesmanFiltro;
 
-        // console.log("filtrosss", matchFiltro, matchSearch, matchFecha );
         return matchFiltro && matchSearch && matchFecha && matchSalesman;
       }) ?? []
     );
   };
 
-  
   const tabs: Filtro[] = [
     "Todas",
     "Pendientes",
@@ -79,15 +93,14 @@ export const TransferenciasCard: React.FC = () => {
   ];
 
   return (
-    <div className="bg-gray-800 rounded-2xl sm:rounded-2xl p-2 sm:p-6">
-       <button
+    <div className="bg-gray-800 rounded-2xl p-2 sm:p-6">
+      <button
         onClick={() => window.location.reload()}
         className="mb-6 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition"
       >
         Actualizar
       </button>
 
-      {/* Tabs */}
       <nav className="flex flex-wrap justify-center sm:justify-start gap-2 mb-6 w-full">
         {tabs.map((tab) => (
           <button
@@ -104,7 +117,6 @@ export const TransferenciasCard: React.FC = () => {
         ))}
       </nav>
 
-      {/* Filtros */}
       <TransferenciaFilters
         busqueda={busqueda}
         setBusqueda={setBusqueda}
@@ -116,24 +128,34 @@ export const TransferenciasCard: React.FC = () => {
         setSalesmanFiltro={setSalesmanFiltro}
       />
 
-      {/* Tabla (envuelta en scroll horizontal si es necesario) */}
       <div className="overflow-x-auto mt-4">
         <TransferenciaTable
           transferencias={filtrarDatos()}
-          onReviewClick={(id) => {
-            setTransferenciaSeleccionada(id);
+          onReviewClick={(t) => {
+            setTransferenciaSeleccionada(t);
             setShowModal(true);
           }}
           onChangeEstado={cambiardeEstadoTransferencia}
         />
       </div>
 
-      {/* Modal */}
       {showModal && transferenciaSeleccionada !== null && (
         <ModalConfirmacion
           mensaje="¿Desea pasar a revisión?"
-          onConfirmar={() => {
-            cambiardeEstadoTransferencia(transferenciaSeleccionada, "review");
+          onConfirmar={async () => {
+            await cambiardeEstadoTransferencia(
+              transferenciaSeleccionada.id,
+              "review"
+            );
+
+            agregarMovimiento(
+              `Transferencia ${transferenciaSeleccionada.salesman} ${transferenciaSeleccionada.clientName}`,
+              Number(transferenciaSeleccionada.amount),
+              "Salida",
+              "Movimiento",
+              false
+            );
+
             setShowModal(false);
             setTransferenciaSeleccionada(null);
           }}
