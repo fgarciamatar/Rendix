@@ -85,6 +85,9 @@ type PDFReportProps = {
   ventaMañanaCaja: number;
   ventaTardeCaja: number;
   ventaTotalCaja: number;
+  hogar: number;
+  gastronomicos: number;
+  negocios: number;
 };
 
 const PDFReport = ({
@@ -100,6 +103,9 @@ const PDFReport = ({
   ventaMañanaCaja,
   ventaTardeCaja,
   ventaTotalCaja,
+  hogar,
+  gastronomicos,
+  negocios
 }: PDFReportProps) => {
   const totalEfectivo = Object.entries(detalleEfectivo).reduce(
     (acc, [den, cant]) => acc + Number(den) * cant,
@@ -219,10 +225,10 @@ const PDFReport = ({
         )}
 
         <View>
-          <Text>Hogar: ${}</Text>
-          <Text>Gastronomicos: ${}</Text>
-          <Text>Negocios: ${}</Text>
-          <Text>Total: ${}</Text>
+          <Text>Hogar: ${hogar}</Text>
+          <Text>Gastronómicos: ${gastronomicos}</Text>
+          <Text>Negocios: ${negocios}</Text>
+          <Text>Total: ${hogar + gastronomicos + negocios}</Text>
         </View>
       </Page>
     </Document>
