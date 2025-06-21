@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
     const res = await fetch(`${API}/verify-token`, {
       method: "GET",
       headers: {
-        Cookie: `token=${token}`, // 👈 reenviás la cookie manualmente al backend
+        Cookie: `token=${token}`, // reenviar la cookie manualmente
       },
     });
 
@@ -62,11 +62,13 @@ export async function middleware(request: NextRequest) {
 
     const allowedRoutes = roleAccess[role];
 
-    const isAllowed =
-      allowedRoutes.includes("*") || allowedRoutes.includes(pathname);
+    // ✅ Esta línea permite subrutas como /dashboard/caja/ingresos
+    const isAllowed = allowedRoutes.some((route) =>
+      pathname === route || pathname.startsWith(`${route}/`)
+    );
 
     if (!isAllowed) {
-      console.log("⛔ Ruta no permitida para este rol");
+      console.log("⛔ Ruta no permitida para este rol:", pathname);
       return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
 
