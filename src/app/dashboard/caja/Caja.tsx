@@ -2,6 +2,7 @@
 import TotalCajaComponent from "@/app/components/Caja/TotalCaja/TotalCajaComponent";
 import MovimientoComponent from "../../components/Caja/Movimientos/MovimientoComponent";
 import CajaClient from "./CajaClient";
+import TipoClient from "@/app/components/Caja/TipoClient/TipoClient";
 
 export default function Caja() {
   return (
@@ -23,6 +24,7 @@ export default function Caja() {
         <TotalCajaComponent />
       </div>
       <div className="bg-gray-800 rounded-2xl">
+        <TipoClient/>
 
       {/* <BuscarCaja /> */}
       </div>
