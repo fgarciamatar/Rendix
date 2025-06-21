@@ -143,6 +143,8 @@ export const TransferenciasCard: React.FC = () => {
         <ModalConfirmacion
           mensaje="¿Desea pasar a revisión?"
           onConfirmar={async () => {
+            setShowModal(false);
+            setTransferenciaSeleccionada(null);
             await cambiardeEstadoTransferencia(
               transferenciaSeleccionada.id,
               "review"
@@ -155,9 +157,6 @@ export const TransferenciasCard: React.FC = () => {
               "Movimiento",
               false
             );
-
-            setShowModal(false);
-            setTransferenciaSeleccionada(null);
           }}
           onCancelar={() => {
             setShowModal(false);
