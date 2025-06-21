@@ -69,8 +69,8 @@ const TransferenciaTable: React.FC<Props> = ({
               onReviewClick(t.id);
               agregarMovimiento(
                 `Transferencia ${t.salesman} ${t.clientName}`,
-                t.amount,
-                "Entrada",
+                Number(t.amount), // 👈 conversión explícita
+                "Salida",
                 "Movimiento",
                 false
               );
@@ -157,7 +157,7 @@ const TransferenciaTable: React.FC<Props> = ({
 
               return (
                 <tr
-                  key={`table-${t.id}`} 
+                  key={`table-${t.id}`}
                   className={`${bgColor} hover:bg-gray-600 transition text-center rounded-lg text-xs sm:text-sm`}
                 >
                   <td className="px-1 py-1">{t.id}</td>
@@ -212,7 +212,7 @@ const TransferenciaTable: React.FC<Props> = ({
 
           return (
             <div
-             key={`card-${t.id}`}
+              key={`card-${t.id}`}
               className={`w-[280px] mx-auto p-3 rounded-xl shadow-md text-xs text-gray-200 flex flex-col gap-2 items-center text-center ${bgColor}`}
             >
               <div>
