@@ -61,9 +61,9 @@ const PreventistasTable = () => {
     setShowLast7Days(newValue);
 
     if (newValue) {
-      await detailUltimo7("Mondello");
+      await detailUltimo7(company);
     } else {
-      await preventistasDetail("Mondello");
+      await preventistasDetail(company);
     }
   };
 

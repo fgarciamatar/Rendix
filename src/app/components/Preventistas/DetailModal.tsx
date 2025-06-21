@@ -3,6 +3,7 @@
 import Userperfil from "@/app/components/UserPerfil/Userperfil";
 import { useEffect, useState } from "react";
 import { useSuperAdmin } from "../../stores/useSuperAdmin";
+import {useLoginStore} from "./../../stores/userLoginStore"
 import { ChartLine, BadgeCheck, XCircle, X } from "lucide-react";
 import { traducirRole, traducirStatus } from "@/app/utils/useHelpers";
 
@@ -31,11 +32,12 @@ export default function DetailModal({
 }: DetailModalProps) {
   const [userData, setUserData] = useState<UserDataGet | null>(null);
   const traerUsuarios = useSuperAdmin((state) => state.traerUsuarios);
+    const userDataLogin = useLoginStore((state) => state.userData);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await traerUsuarios("Mondello");
+        const response = await traerUsuarios(userDataLogin.company);
         if (response.success) {
           const usuarioFiltrado = (response.usuarios as UserDataGet[]).find(
             (usuario) => usuario.id === id
