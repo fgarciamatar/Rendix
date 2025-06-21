@@ -225,10 +225,11 @@ const PDFReport = ({
         )}
 
         <View>
-          <Text>Hogar: ${hogar}</Text>
-          <Text>Gastronómicos: ${gastronomicos}</Text>
-          <Text>Negocios: ${negocios}</Text>
-          <Text>Total: ${hogar + gastronomicos + negocios}</Text>
+          <Text style={styles.subtitle}>Clientes</Text>
+          <Text>Hogar: {hogar} clientes</Text>
+          <Text>Gastronómicos: {gastronomicos} clientes</Text>
+          <Text>Negocios: {negocios} clientes</Text>
+          <Text>Total: {hogar + gastronomicos + negocios} clientes</Text>
         </View>
       </Page>
     </Document>

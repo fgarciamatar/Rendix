@@ -48,7 +48,7 @@ export default function Home() {
                     Comenzar ahora <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link
-                    href="/login"
+                   href="/contact"
                     className="rounded-md border border-[#1a2035] text-white hover:bg-[#1a2035] px-4 py-2"
                   >
                     Contáctanos
