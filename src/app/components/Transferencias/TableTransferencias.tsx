@@ -65,6 +65,7 @@ const TransferenciaTable: React.FC<Props> = ({
         (role === "admin" || role === "cashier") && (
           <button
             onClick={() => {
+              console.log(t.amount);
               onReviewClick(t.id);
               agregarMovimiento(
                 `Transferencia ${t.salesman} ${t.clientName}`,
