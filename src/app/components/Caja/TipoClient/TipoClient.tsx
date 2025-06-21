@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
+import { useTipoClienteStore } from "@/app/stores/useTipoClient";
 
 const buttonStyles = {
   base: "px-6 py-3 rounded-xl text-white font-semibold shadow-md transition transform hover:scale-105 active:scale-95 text-lg",
@@ -9,9 +10,8 @@ const buttonStyles = {
 };
 
 export const TipoClient: React.FC = () => {
-  const [hogar, setHogar] = useState(0);
-  const [gastronomicos, setGastronomicos] = useState(0);
-  const [negocios, setNegocios] = useState(0);
+  const { hogar, gastronomicos, negocios, incrementar, resetear } =
+    useTipoClienteStore();
 
   const total = hogar + gastronomicos + negocios;
 
@@ -21,19 +21,19 @@ export const TipoClient: React.FC = () => {
 
       <div className="flex flex-col sm:flex-row gap-4">
         <button
-          onClick={() => setHogar(hogar + 1)}
+          onClick={() => incrementar("hogar")}
           className={`${buttonStyles.base} ${buttonStyles.hogar}`}
         >
           Hogar ({hogar})
         </button>
         <button
-          onClick={() => setGastronomicos(gastronomicos + 1)}
+          onClick={() => incrementar("gastronomicos")}
           className={`${buttonStyles.base} ${buttonStyles.gastronomicos}`}
         >
           Gastronómicos ({gastronomicos})
         </button>
         <button
-          onClick={() => setNegocios(negocios + 1)}
+          onClick={() => incrementar("negocios")}
           className={`${buttonStyles.base} ${buttonStyles.negocios}`}
         >
           Negocios ({negocios})
@@ -43,6 +43,13 @@ export const TipoClient: React.FC = () => {
       <div className="mt-6 text-xl font-medium text-gray-300">
         Total: <span className="text-white font-bold">{total}</span>
       </div>
+
+      <button
+        onClick={resetear}
+        className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg"
+      >
+        Resetear
+      </button>
     </div>
   );
 };

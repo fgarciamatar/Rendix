@@ -3,6 +3,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { FiDownload } from "react-icons/fi";
 import PDFReport from "../PDFReport";
 import { useState } from "react";
+import { useTipoClienteStore } from "@/app/stores/useTipoClient";
 
 interface Movimiento {
   id: string;
@@ -32,6 +33,8 @@ type PDFProps = {
   onDownloaded?: () => void; // ✨ NUEVO CALLBACK
 };
 
+
+
 export default function PDFButtonClient({
   fecha,
   turno,
@@ -45,6 +48,7 @@ export default function PDFButtonClient({
   onDownloaded,
 }: PDFProps) {
   const [clicked, setClicked] = useState(false);
+  const { hogar, gastronomicos, negocios } = useTipoClienteStore();
   const ventaTarde =
   entradas
     .filter((mov) => mov.tipoConcepto === "Venta")
@@ -82,6 +86,10 @@ export default function PDFButtonClient({
           ventaMañanaCaja={ventaMañanaCaja}
           ventaTardeCaja={ventaTardeCaja}
           ventaTotalCaja={ventaTotalCaja}
+          hogar={hogar}
+          gastronomicos={gastronomicos}
+          negocios={negocios}
+
         />
       }
       fileName={`Caja[${fecha}]-[${turno}].pdf`}

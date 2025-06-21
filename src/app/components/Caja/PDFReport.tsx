@@ -106,13 +106,10 @@ const PDFReport = ({
     0
   );
 
-const formatFecha = (fecha: string) => {
-
-
-  const [año, mes, dia] = fecha.split("-");
-  return `${dia}/${mes}/${año}`;
-};
-
+  const formatFecha = (fecha: string) => {
+    const [año, mes, dia] = fecha.split("-");
+    return `${dia}/${mes}/${año}`;
+  };
 
   return (
     <Document>
@@ -182,7 +179,7 @@ const formatFecha = (fecha: string) => {
         )}
 
         <View style={styles.totalBox}>
-          {turno !== "mañana" && (
+          {turno !== "Mañana" && (
             <>
               <Text style={styles.totalText}>
                 Sistema Mañana = ${ventaMañana}
@@ -198,7 +195,7 @@ const formatFecha = (fecha: string) => {
         </View>
 
         <View style={styles.totalBox}>
-          {turno !== "tarde" && (
+          {turno !== "Mañana" && (
             <>
               <Text style={styles.totalText}>
                 Caja Mañana = ${ventaMañanaCaja}
@@ -212,8 +209,20 @@ const formatFecha = (fecha: string) => {
             </>
           )}
         </View>
-        <View style={styles.totalBox}>
-          <Text style={styles.totalText} > Diferencia = {ventaTotal - ventaTotalCaja}</Text>
+        {turno !== "Mañana" && (
+          <View style={styles.totalBox}>
+            <Text style={styles.totalText}>
+              {" "}
+              Diferencia = {ventaTotal - ventaTotalCaja}
+            </Text>
+          </View>
+        )}
+
+        <View>
+          <Text>Hogar: ${}</Text>
+          <Text>Gastronomicos: ${}</Text>
+          <Text>Negocios: ${}</Text>
+          <Text>Total: ${}</Text>
         </View>
       </Page>
     </Document>
