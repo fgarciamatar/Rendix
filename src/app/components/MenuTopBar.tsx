@@ -26,20 +26,19 @@ export default function MenuTopBar({ name, company, onCloseMenu }: Props) {
   const handleCancelar = () => setMostrarModal(false);
 
   const handleConfirmar = async () => {
-    setLoading(true);
-    setMostrarModal(false);
+  setLoading(true);
+  setMostrarModal(false);
 
-    // Esperar un breve momento para mostrar el loader con animación
-    setTimeout(async () => {
-      try {
-        await useLoginStore.getState().logout();
-        router.push("/login");
-      } catch (error) {
-        console.error("Error al cerrar sesión:", error);
-        setLoading(false);
-      }
-    }, 20);
-  };
+  try {
+    await useLoginStore.getState().logout();
+  router.replace("/login");
+
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+    setLoading(false);
+  }
+};
+
 
   const handleRedirect = (path: string) => {
     onCloseMenu();

@@ -11,7 +11,7 @@ export default function SuperAdminDashboard() {
 
   useEffect(() => {
     if (!access) {
-      router.push("/SUPERADMIN/login");
+      router.replace("/SUPERADMIN/login");
     }
   }, [access, router]);
 

@@ -33,7 +33,7 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
   try {
     const response = await login(userAndCompany, password);
     if (response === true) {
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } else {
       setError("Credenciales incorrectas.");
     }

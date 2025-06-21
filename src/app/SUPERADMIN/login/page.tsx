@@ -32,7 +32,7 @@ export default function SuperAdminLogin() {
     console.log("acceso", res.success);
 
     if (res.success) {
-      router.push("/SUPERADMIN/dashboard");
+      router.replace("/SUPERADMIN/dashboard");
     } else {
       setError(res.error);
       setMessage("");

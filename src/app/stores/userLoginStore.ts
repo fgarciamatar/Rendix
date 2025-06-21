@@ -94,37 +94,44 @@ export const useLoginStore = create<LoginState>()(
 
         return data.access;
       },
+logout: async () => {
+  try {
+    const res = await fetch(`${API}/logout`, {
+      method: "POST",
+      credentials: "include", // ✅ necesario para que envíe la cookie
+    });
 
-      logout: async () => {
-        try {
-          const res = await fetch(`${API}/logout`, {
-            method: "POST",
-            credentials: "include",
-          });
+    if (res.ok) {
+      // Limpiar estado global
+      set({
+        access: false,
+        role: "",
+        userData: {
+          id: 0,
+          name: "",
+          lastName: "",
+          role: "",
+          password: "",
+          status: "",
+          company: "",
+        },
+      });
 
-          if (res.ok) {
-            set({
-              access: false,
-              role: "",
-              userData: {
-                id: 0,
-                name: "",
-                lastName: "",
-                role: "",
-                password: "",
-                status: "",
-                company: "",
-              },
-            });
-            sessionStorage.removeItem("UserAccess");
-            return res;
-          } else {
-            console.error("Error al cerrar sesión");
-          }
-        } catch (err) {
-          console.error("Error en logout:", err);
-        }
-      },
+      // Limpiar sesión persistida
+      sessionStorage.removeItem("UserAccess");
+
+      // redirigir desde acá 
+      // router.push("/login");
+
+      return res;
+    } else {
+      console.error("❌ Error al cerrar sesión:", await res.text());
+    }
+  } catch (err) {
+    console.error("⚠️ Error en logout:", err);
+  }
+},
+
     }),
     {
       name: "UserAccess",
