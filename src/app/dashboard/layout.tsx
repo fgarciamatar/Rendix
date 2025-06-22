@@ -35,6 +35,16 @@ export default function DashboardLayout({
         </aside>
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
+
+      <footer className="w-full border-t py-6  border-[#243B85] bg-[#243B85]/95 backdrop-blur supports-[backdrop-filter]:bg-[#2A4080]/60">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
+          <p className="text-center md:text-left text-base text-gray-400 tracking-wide mb-4 md:mb-0">
+            &copy; {new Date().getFullYear()} Rendix. Todos los derechos
+            reservados.
+          </p>
+          <div className="w-full md:w-auto flex justify-center md:justify-end"></div>
+        </div>
+      </footer>
     </div>
   );
 }
