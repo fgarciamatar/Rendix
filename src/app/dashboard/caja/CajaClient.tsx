@@ -107,7 +107,7 @@ export default function CajaClient() {
     const tiempo = hora + minutos / 60;
     if (tiempo >= 7 && tiempo < 14) {
       setTurno("Mañana");
-    } else if (tiempo >= 14 && tiempo < 22.5) {
+    } else if (tiempo >= 14 && tiempo < 23.5) {
       setTurno("Tarde");
     } else {
       setTurno("Noche");

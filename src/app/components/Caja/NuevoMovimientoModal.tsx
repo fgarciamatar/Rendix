@@ -109,7 +109,7 @@ const hayVenta = [...entradas, ...salidas].some(
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
-      <div className="bg-gray-900 text-white p-6 rounded-lg w-full max-w-md shadow-xl">
+      <div className="bg-gradient-to-b from-[#1e469d] to-[#122b70] text-white p-6 rounded-lg w-full max-w-md shadow-xl">
         <h2 className="text-xl font-bold mb-2">Nuevo Movimiento de Caja</h2>
         <p className="text-sm text-gray-400 mb-4">
           Ingrese los detalles del nuevo movimiento.
@@ -191,7 +191,7 @@ const hayVenta = [...entradas, ...salidas].some(
                         </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
+            className="px-4 py-2 bg-red-600 text-white  hover:bg-red-700 transition"
           >
             Cancelar
           </button>

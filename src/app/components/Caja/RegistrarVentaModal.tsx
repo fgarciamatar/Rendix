@@ -54,7 +54,7 @@ const RegistarVentaModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
-      <div className="bg-gray-900 text-white p-6 rounded-lg w-full max-w-md shadow-xl">
+      <div className=" bg-gradient-to-b from-[#1e469d] to-[#122b70] text-white p-6 rounded-lg w-full max-w-md shadow-xl">
         <h2 className="text-xl font-bold mb-4">Venta total para mañana:</h2>
 
         <input
@@ -70,13 +70,13 @@ const RegistarVentaModal: React.FC<Props> = ({ isOpen, onClose }) => {
         <div className="flex justify-end gap-2">
           <button
             onClick={handleClose}
-            className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-gray-600 transition"
           >
             Cancelar
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-white text-gray-900 rounded font-semibold hover:bg-gray-200 transition"
+            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-semibold transition"
           >
             Guardar
           </button>

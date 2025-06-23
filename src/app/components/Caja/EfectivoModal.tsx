@@ -220,13 +220,13 @@ const EfectivoModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
 
               <button
                 onClick={handleClose}
-                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition"
+                className="px-4 py-2 bg-red-600 text-whiterounded hover:bg-gray-600 transition"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition"
               >
                 Registrar Efectivo
               </button>

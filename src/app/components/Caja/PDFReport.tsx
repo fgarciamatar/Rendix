@@ -85,6 +85,9 @@ type PDFReportProps = {
   ventaMañanaCaja: number;
   ventaTardeCaja: number;
   ventaTotalCaja: number;
+  hogar: number;
+  gastronomicos: number;
+  negocios: number;
 };
 
 const PDFReport = ({
@@ -100,6 +103,9 @@ const PDFReport = ({
   ventaMañanaCaja,
   ventaTardeCaja,
   ventaTotalCaja,
+  hogar,
+  gastronomicos,
+  negocios
 }: PDFReportProps) => {
   const totalEfectivo = Object.entries(detalleEfectivo).reduce(
     (acc, [den, cant]) => acc + Number(den) * cant,
@@ -107,10 +113,7 @@ const PDFReport = ({
   );
 
   const formatFecha = (fecha: string) => {
-    const date = new Date(fecha);
-    const dia = String(date.getDate()).padStart(2, "0");
-    const mes = String(date.getMonth() + 1).padStart(2, "0");
-    const año = date.getFullYear();
+    const [año, mes, dia] = fecha.split("-");
     return `${dia}/${mes}/${año}`;
   };
 
@@ -182,7 +185,7 @@ const PDFReport = ({
         )}
 
         <View style={styles.totalBox}>
-          {turno !== "mañana" && (
+          {turno !== "Mañana" && (
             <>
               <Text style={styles.totalText}>
                 Sistema Mañana = ${ventaMañana}
@@ -198,7 +201,7 @@ const PDFReport = ({
         </View>
 
         <View style={styles.totalBox}>
-          {turno !== "tarde" && (
+          {turno !== "Mañana" && (
             <>
               <Text style={styles.totalText}>
                 Caja Mañana = ${ventaMañanaCaja}
@@ -212,8 +215,21 @@ const PDFReport = ({
             </>
           )}
         </View>
-        <View style={styles.totalBox}>
-          <Text style={styles.totalText} > Diferencia = {ventaTotal - ventaTotalCaja}</Text>
+        {turno !== "Mañana" && (
+          <View style={styles.totalBox}>
+            <Text style={styles.totalText}>
+              {" "}
+              Diferencia = {ventaTotal - ventaTotalCaja}
+            </Text>
+          </View>
+        )}
+
+        <View>
+          <Text style={styles.subtitle}>Clientes</Text>
+          <Text>Hogar: {hogar} clientes</Text>
+          <Text>Gastronómicos: {gastronomicos} clientes</Text>
+          <Text>Negocios: {negocios} clientes</Text>
+          <Text>Total: {hogar + gastronomicos + negocios} clientes</Text>
         </View>
       </Page>
     </Document>

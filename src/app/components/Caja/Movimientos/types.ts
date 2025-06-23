@@ -4,3 +4,8 @@ export type movimientosProps = {
   esEntrada: boolean;
   // montoTotal: number;
 };
+
+export interface UserData {
+  name: string;
+  company: string;
+}
