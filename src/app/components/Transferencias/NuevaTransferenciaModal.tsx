@@ -50,6 +50,7 @@ export const NuevaTransferenciaModal: React.FC<Props> = ({ onClose }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [modalMessage, setModalMessage] = useState<ModalMessage | null>(null);
+  const [showFullImage, setShowFullImage] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -252,6 +253,26 @@ export const NuevaTransferenciaModal: React.FC<Props> = ({ onClose }) => {
         />
       )}
 
+      {showFullImage && imagePreview && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60]">
+          {/* Botón de cierre */}
+          <button
+            onClick={() => setShowFullImage(false)}
+            className="absolute top-4 right-4 text-white text-3xl font-bold hover:text-red-500 transition"
+            aria-label="Cerrar imagen ampliada"
+          >
+            &times;
+          </button>
+
+          {/* Imagen ampliada */}
+          <img
+            src={imagePreview}
+            alt="Imagen ampliada"
+            className="max-w-full max-h-full rounded-lg shadow-lg"
+          />
+        </div>
+      )}
+
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div className="bg-gradient-to-b from-[#1e469d] to-[#122b70] text-white p-6 rounded-xl w-full max-w-2xl shadow-lg overflow-y-auto max-h-[90vh]">
           <h2 className="text-xl font-bold mb-1">
@@ -287,8 +308,10 @@ export const NuevaTransferenciaModal: React.FC<Props> = ({ onClose }) => {
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      className="max-h-40 mx-auto mb-2 rounded-md"
+                      className="max-h-40 mx-auto mb-2 rounded-md cursor-pointer transition hover:opacity-80"
+                      onClick={() => setShowFullImage(true)}
                     />
+
                     <p className="text-sm text-gray-300">{image?.name}</p>
                     <button
                       type="button"
