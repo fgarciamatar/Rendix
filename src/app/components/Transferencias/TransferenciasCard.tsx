@@ -1,6 +1,7 @@
 "use client";
 import { useCajaStore } from "@/app/stores/useCajaStore";
 import { useTransferenciasStore } from "@/app/stores/useTransferenciasStore";
+import { useLoginStore } from "../../stores/userLoginStore";
 import React, { useEffect, useState } from "react";
 import { Filtro, mapFiltroToEstado } from "../../utils/useHelpers";
 import ModalConfirmacion from "../ModalConfirm/ModalConfirm";
@@ -33,6 +34,7 @@ export const TransferenciasCard: React.FC = () => {
     useState<Transferencia | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
 
+  const userData = useLoginStore((state) => state.userData);
   const allTransfer = useTransferenciasStore((state) => state.allTransfer);
   const transferLoading = useTransferenciasStore(
     (state) => state.transferLoading
@@ -47,21 +49,28 @@ export const TransferenciasCard: React.FC = () => {
     (state) => state.changeStateTransfer
   );
   const agregarMovimiento = useCajaStore((state) => state.agregarMovimiento);
+  const companyId = userData.company; 
 
-  useEffect(() => {
-    if (currentPage === 0) getAllTransfer();
+useEffect(() => {
+  if (userData?.company && currentPage === 0) {
+    getAllTransfer(userData.company);
     setCurrentPage(1);
-  }, [currentPage]);
+  }
+}, [userData, currentPage]);
 
-  useEffect(() => {
-    if (transferLoading !== 0) getAllTransfer();
+
+useEffect(() => {
+  if (userData?.company && transferLoading !== 0) {
+    getAllTransfer(userData.company);
     setTransferLoading();
-  }, [transferLoading]);
+  }
+}, [userData, transferLoading]);
+
 
   const cambiardeEstadoTransferencia = async (id: number, estado: string) => {
     setCurrentPage(0);
     await changeStateTransfer(id, estado);
-    getAllTransfer();
+    getAllTransfer(companyId);
   };
 
   const filtrarDatos = () => {

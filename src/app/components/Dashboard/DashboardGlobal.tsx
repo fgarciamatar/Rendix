@@ -11,6 +11,9 @@ import Loader from "@/app/components/Loader";
 import TransferenciasTrendChart from "@/app/components/Transferencias/TransferenciasTrendChart";
 
 export default function DashboardGlobal() {
+const company = localStorage.getItem("company");
+
+
   const {
     transferStadistics,
     bankDistribution,
@@ -18,11 +21,12 @@ export default function DashboardGlobal() {
     getTransferStadistics,
   } = useDashboard();
 
-  useEffect(() => {
-    if (!transferStadistics ) {
-      getTransferStadistics();
-    }
-  }, []);
+useEffect(() => {
+  if (!transferStadistics && company) {
+    getTransferStadistics(company);
+  }
+}, [transferStadistics, company]);
+
 
   
   if (loading || !transferStadistics) {

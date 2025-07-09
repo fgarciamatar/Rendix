@@ -86,6 +86,9 @@ export const useLoginStore = create<LoginState>()(
         set({ role: data.user.role });
         set({ userData: data.user });
 
+        localStorage.setItem("company", data.user.company);
+
+
         if (data.access) {
           set({ access: data.access });
         } else {

@@ -59,8 +59,8 @@ interface TransferenciasState {
   bankDistribution: BankDistribution[];
   topPreventistas?: TopPreventistas[];
 
-  getTransferStadistics: () => Promise<void>;
-  getTransferStadisticsPreventista: (salesman:string) => Promise<void>;
+  getTransferStadistics: (company: string) => Promise<void>;
+  getTransferStadisticsPreventista: (salesman: string, company: string) => Promise<void>;
 }
 
 export const useDashboard = create<TransferenciasState>((set) => ({
@@ -72,10 +72,10 @@ export const useDashboard = create<TransferenciasState>((set) => ({
   bankDistribution: [],
   topPreventistas: [], // <--- falta agregar esto por defecto
 
-  getTransferStadistics: async () => {
+  getTransferStadistics: async (company: string) => {
     set({ loading: true, error: null });
     try {
-      const transferenciasRes = await fetch(`${API}/getAllTransfers`);
+     const transferenciasRes = await fetch(`${API}/getAllTransfers?company=${encodeURIComponent(company)}`);
       if (!transferenciasRes.ok)
         throw new Error(`Error HTTP: ${transferenciasRes.status}`);
 
@@ -219,19 +219,18 @@ export const useDashboard = create<TransferenciasState>((set) => ({
       set({ error: message, loading: false });
     }
   },
-  getTransferStadisticsPreventista: async (salesman) => {
+  getTransferStadisticsPreventista: async (salesman, company) => {
     set({ loading: true, error: null });
     try {
-      const transferenciasRes = await fetch(`${API}/getAllTransfers`);
+      const transferenciasRes = await fetch(`${API}/getAllTransfers?company=${encodeURIComponent(company)}`);
       if (!transferenciasRes.ok)
         throw new Error(`Error HTTP: ${transferenciasRes.status}`);
 
       const dataTransfer: Transferencia[] = await transferenciasRes.json();
 
       const dataTransferPreventista = dataTransfer.filter(
-  (t) => t.salesman && t.salesman.toLowerCase() === salesman.toLowerCase()
-);
-
+        (t) => t.salesman && t.salesman.toLowerCase() === salesman.toLowerCase()
+      );
 
       const getDailyStatusData = (): DailyStatusData[] => {
         const dateMap = new Map<string, DailyStatusData>();
@@ -362,7 +361,7 @@ export const useDashboard = create<TransferenciasState>((set) => ({
         transferStadistics: resumen(),
         dailyStatusData: getDailyStatusData(),
         bankDistribution: calculateBankDistribution(),
-        topPreventistas: topPreventistas(), 
+        topPreventistas: topPreventistas(),
         loading: false,
       });
     } catch (err) {

@@ -26,7 +26,7 @@ interface TransferenciasState {
   transferLoading: number;
   loading: boolean;
   error: string | null;
-  getAllTransfer: () => Promise<void>;
+  getAllTransfer: (company: string) => Promise<void>;
   changeStateTransfer: (id: number, status: string) => Promise<void>;
   createTransfer: (formData: FormData) => Promise<void>;
   setTransferencias: (data: Transferencia[]) => void;
@@ -47,26 +47,28 @@ export const useTransferenciasStore = create<TransferenciasState>((set) => ({
   loading: false,
   error: null,
 
-  getAllTransfer: async () => {
-    set({ loading: true, error: null });
-    try {
-      const res = await fetch(`${API}/getAllTransfers`);
-      if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-      const data: Transferencia[] = await res.json();
-      // console.log("TRANSFERENCIA DATA",data);
+ getAllTransfer: async (company: string) => {
+  set({ loading: true, error: null });
+  console.log(`Fetching transfers for company: ${company}`);
+  
+  try {
+    const res = await fetch(`${API}/getAllTransfers?company=${company}`);
+    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+    const data: Transferencia[] = await res.json();
 
-      set({ allTransfer: data, loading: false });
-    } catch (err) {
-      let message = "Error desconocido";
-      if (err instanceof Error) {
-        message = err.message;
-      }
-      set({
-        error: message,
-        loading: false,
-      });
+    set({ allTransfer: data, loading: false });
+  } catch (err) {
+    let message = "Error desconocido";
+    if (err instanceof Error) {
+      message = err.message;
     }
-  },
+    set({
+      error: message,
+      loading: false,
+    });
+  }
+},
+
   createTransfer: async (formData: FormData) => {
     try {
       const res = await fetch(`${API}/createTransfer`, {

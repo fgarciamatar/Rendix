@@ -1,28 +1,27 @@
 "use client";
 
 import { useDashboard } from "@/app/stores/useDashboardStore";
-import { useLoginStore } from "./../../stores/userLoginStore"
 import React, { useEffect } from "react";
 import { AiOutlineCloseCircle, AiOutlineWarning } from "react-icons/ai";
 import { FaCheckCircle, FaDollarSign } from "react-icons/fa";
 import { HiOutlineDocumentReport } from "react-icons/hi";
+import { useLoginStore } from "./../../stores/userLoginStore";
 
 import Loader from "@/app/components/Loader";
 
 export default function DashboardPreventista() {
-  const {
-    transferStadistics,
-    loading,
-    getTransferStadisticsPreventista,
-  } = useDashboard();
+  const company = localStorage.getItem("company");
+
+  const { transferStadistics, loading, getTransferStadisticsPreventista } =
+    useDashboard();
 
   const { name } = useLoginStore((state) => state.userData);
 
   useEffect(() => {
-    if (!transferStadistics && !loading) {
-      getTransferStadisticsPreventista(name);
+    if (!transferStadistics && !loading && name && company) {
+      getTransferStadisticsPreventista(name, company);
     }
-  }, [transferStadistics, loading]);
+  }, [transferStadistics, loading, name, company]);
 
   if (loading || !transferStadistics) {
     return <Loader />;

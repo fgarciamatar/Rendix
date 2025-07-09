@@ -62,7 +62,7 @@ export const usePreventistas = create<TransferenciasState>((set) => ({
 
     try {
       // Traer transferencias
-      const transferenciasRes = await fetch(`${API}/getAllTransfers`);
+      const transferenciasRes =await fetch(`${API}/getAllTransfers?company=${encodeURIComponent(companyName)}`);
       if (!transferenciasRes.ok) throw new Error(`Error HTTP: ${transferenciasRes.status}`);
       const dataTransfer: Transferencia[] = await transferenciasRes.json();
 
@@ -113,7 +113,7 @@ export const usePreventistas = create<TransferenciasState>((set) => ({
 
   try {
     // Traer transferencias
-    const transferenciasRes = await fetch(`${API}/getAllTransfers`);
+    const transferenciasRes = await fetch(`${API}/getAllTransfers?company=${encodeURIComponent(companyName)}`);
     if (!transferenciasRes.ok) throw new Error(`Error HTTP: ${transferenciasRes.status}`);
     const dataTransfer: Transferencia[] = await transferenciasRes.json();
 
