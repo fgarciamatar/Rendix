@@ -4,8 +4,10 @@ import { useLoginStore } from "../../app/stores/userLoginStore";
 import DashboardGlobal from "../components/Dashboard/DashboardGlobal";
 import DashboardPreventista from "../components/Dashboard/DashboardPreventista";
 
+
 export default function Dashboard() {
   const { role } = useLoginStore((state) => state.userData);
+
 
   useEffect(() => {
     if (!role || role === undefined) {
@@ -15,7 +17,7 @@ export default function Dashboard() {
       };
       loading();
     }
-  }, [ role]);
+  }, [role]);
 
   return (
     <div>

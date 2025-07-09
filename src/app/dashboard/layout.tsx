@@ -1,8 +1,9 @@
 // DashboardLayout.tsx
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { TopBar } from "../components/TopBar";
+import { refreshToken } from "../services/authServices";
 
 export default function DashboardLayout({
   children,
@@ -13,6 +14,14 @@ export default function DashboardLayout({
 
   const handleSidebarClose = () => setSidebarOpen(false);
   const handleSidebarToggle = () => setSidebarOpen(!sidebarOpen);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshToken();
+    }, 15 * 60 * 1000); // cada 15 minutos
+
+    return () => clearInterval(interval);
+  }, [refreshToken]);
 
   return (
     <div className="flex min-h-screen flex-col">
