@@ -35,12 +35,12 @@ export const NuevaTransferenciaModal: React.FC<Props> = ({ onClose }) => {
   const today = new Date().toISOString().split("T")[0];
 
   const initialForm: FormState = {
-    numberOperation: 0,
+    numberOperation:  "" as unknown as number,
     clientNumber: "",
     clientName: "",
     dateTransfer: "",
     dateOfLoading: today,
-    amount: 0,
+    amount: "" as unknown as number,
     originBank: "",
     destinationBank: "",
   };
@@ -353,8 +353,14 @@ export const NuevaTransferenciaModal: React.FC<Props> = ({ onClose }) => {
                 name="amount"
                 type="number"
                 step="0.01"
-                value={form.amount}
-                onChange={handleChange}
+                value={form.amount === 0 ? "" : form.amount}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setForm((prev) => ({
+                    ...prev,
+                    amount: val === "" ? 0 : Number(val),
+                  }));
+                }}
                 className="w-full p-2 rounded bg-gray-800 border border-gray-600"
                 required
               />
@@ -379,11 +385,13 @@ export const NuevaTransferenciaModal: React.FC<Props> = ({ onClose }) => {
               <input
                 name="numberOperation"
                 type="number"
-                value={form.numberOperation}
+                value={form.numberOperation === 0 ? "" : form.numberOperation}
                 onChange={handleChange}
                 className="w-full p-2 rounded bg-gray-800 border border-gray-600"
                 required
               />
+
+
             </div>
 
             <div>

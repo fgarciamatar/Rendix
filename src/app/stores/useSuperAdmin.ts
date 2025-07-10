@@ -53,6 +53,8 @@ interface SuperAdminState {
   usuarios: UserDataGet[];
   setAccess: (val: boolean) => void;
 
+  logout: () => void;
+
   sendPin: () => Promise<
     { success: true; message: string } | { success: false; error: string }
   >;
@@ -128,13 +130,22 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
         body: JSON.stringify({ pin }),
       });
 
-      const data: { valid: boolean; error?: string } = await res.json();
+      const data: {
+        valid: boolean;
+        error?: string;
+        token?: string;
+      } = await res.json();
 
       if (!res.ok || !data.valid) {
         throw new Error(data.error || "PIN incorrecto");
       }
 
-      set({ access: true });
+      // ✅ Guardar el token en sessionStorage
+      if (data.token) {
+        sessionStorage.setItem("saToken", data.token);
+      }
+
+      set({ access: true }); // esto lo podés usar para condicionar la navegación
       return { success: true };
     } catch (error) {
       const message =
@@ -145,10 +156,14 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
 
   //EMPRESAS
   crearEmpresa: async (data) => {
+    const token = sessionStorage.getItem("saToken");
     try {
       const res = await fetch(`${API}/createCompany`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(data),
       });
       const result = await res.json();
@@ -165,10 +180,14 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
     }
   },
   editarEmpresa: async (data) => {
+    const token = sessionStorage.getItem("saToken");
     try {
       const res = await fetch(`${API}/editCompany`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(data),
       });
 
@@ -187,10 +206,14 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
   },
 
   eliminarEmpresa: async (name) => {
+    const token = sessionStorage.getItem("saToken");
     try {
       const res = await fetch(`${API}/deleteCompany`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ name }), // enviar nombre por body
       });
       const result = await res.json();
@@ -207,11 +230,34 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
     }
   },
   traerEmpresas: async () => {
+    const token = sessionStorage.getItem("saToken");
+
+    if (!token) {
+      return { success: false, error: "Token no encontrado. Iniciá sesión." };
+    }
+
     try {
-      const res = await fetch(`${API}/getCompanies`);
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error);
-      console.log("data", result.companies);
+      const res = await fetch(`${API}/getCompanies`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      let result;
+      try {
+        result = await res.json();
+      } catch {
+        throw new Error("Error de formato en la respuesta del servidor");
+      }
+
+      if (!res.ok) throw new Error(result.error || "Error desconocido");
+
+      // console.log solo si estás en desarrollo
+      if (process.env.NODE_ENV !== "production") {
+        console.log("data", result.companies);
+      }
 
       return {
         success: true,
@@ -227,6 +273,7 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
 
   // USUARIOS
   crearUsuario: async (data) => {
+    const token = sessionStorage.getItem("saToken");
     const usuarioData = {
       ...data,
       id: Number(data.id), // 🔄 Aseguramos que id sea number
@@ -234,7 +281,10 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
     try {
       const res = await fetch(`${API}/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(usuarioData),
       });
       const result = await res.json();
@@ -252,6 +302,7 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
   },
 
   editarUsuario: async (data) => {
+    const token = sessionStorage.getItem("saToken");
     const usuarioData = {
       ...data,
       status: data.status || "active",
@@ -263,7 +314,10 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
     try {
       const res = await fetch(`${API}/editUser`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(usuarioData), // { id: 1, name: 'nuevo nombre' }
       });
 
@@ -282,6 +336,7 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
   },
 
   eliminarUsuario: async (data) => {
+    const token = sessionStorage.getItem("saToken");
     const usuarioData = {
       ...data,
       id: Number(data.id), // 🔄 Aseguramos que id sea number
@@ -289,7 +344,10 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
     try {
       const res = await fetch(`${API}/deleteUser`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(usuarioData), // enviar id por body
       });
       const result = await res.json();
@@ -308,9 +366,13 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
 
   traerUsuarios: async (companyName) => {
     try {
-      const res = await fetch(`${API}/getUsers`, {
+      const token = sessionStorage.getItem("saToken");
+      const res = await fetch(`${API}/getUsers-Admin`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ companyName }), // enviar id por body
       });
 
@@ -318,9 +380,9 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
       // console.log("result", result);
 
       if (!res.ok) throw new Error(result.error);
-       set({ usuarios: result.userList });
+      set({ usuarios: result.userList });
       //  console.log("result",result.userList);
-       
+
       return {
         success: true,
         message: result.message,
@@ -331,5 +393,10 @@ export const useSuperAdmin = create<SuperAdminState>((set) => ({
         error instanceof Error ? error.message : "Error al traer los usuarios";
       return { success: false, error: message };
     }
+  },
+
+  logout: () => {
+    sessionStorage.removeItem("saToken"); // ✅ eliminar token
+    set({ access: false }); // ✅ resetear acceso
   },
 }));
