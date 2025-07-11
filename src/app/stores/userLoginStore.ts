@@ -64,7 +64,7 @@ export const useLoginStore = create<LoginState>()(
       setUserData: (data) => set({ userData: data }),
 
       login: async (input: string, password: string) => {
-        const [userName, companyName] = input.split("@");
+  const [userName, companyName] = input.split("@").map((str) => str.trim());
         if (!userName || !companyName) throw new Error("Formato inválido");
 
         const payload: UserLogin = { userName, companyName, password };
